@@ -1,0 +1,55 @@
+# Source files
+src/
+tsconfig.json
+jest.config.cjs
+.eslintrc.cjs
+.prettierrc
+
+# Development files
+.git/
+.github/
+.vscode/
+.idea/
+
+# Tests and coverage
+**/*.test.ts
+**/*.test.js
+**/__tests__/
+coverage/
+.nyc_output
+
+# Build artifacts
+*.tsbuildinfo
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Environment files
+.env*
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Docker
+Dockerfile
+.dockerignore
+
+# Temporary files
+*.tmp
+*.temp

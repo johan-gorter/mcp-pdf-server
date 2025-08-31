@@ -123,18 +123,144 @@ Standard MCP error codes:
 
 ## Development
 
+### Prerequisites
+
+- Node.js 16+ 
+- npm or yarn
+- TypeScript
+
+### Setup
+
 ```bash
+# Clone the repository
+git clone https://github.com/johan-gorter/mcp-pdf-server.git
+cd mcp-pdf-server
+
 # Install dependencies
 npm install
 
-# Build
+# Build the project
+npm run build
+```
+
+### Development Scripts
+
+```bash
+# Build TypeScript to JavaScript
 npm run build
 
-# Test locally
-node dist/index.js /path/to/test/directory
+# Build in watch mode (rebuilds on file changes)
+npm run watch
 
-# Package as Desktop Extension
-npm run package:dxt
+# Run the server locally for development
+npm run dev
+
+# Start the compiled server
+npm run start
+
+# Run tests
+npm test
+
+# Run tests in watch mode
+npm run test:watch
+
+# Run tests with coverage
+npm run test:coverage
+
+# Lint the code
+npm run lint
+
+# Fix linting issues
+npm run lint:fix
+
+# Format code with Prettier
+npm run format
+
+# Check code formatting
+npm run format:check
+
+# Type check without emitting files
+npm run type-check
+
+# Clean build artifacts
+npm run clean
+```
+
+### Testing
+
+The project uses Jest for testing with TypeScript support:
+
+```bash
+# Run all tests
+npm test
+
+# Run tests in watch mode during development
+npm run test:watch
+
+# Generate test coverage report
+npm run test:coverage
+```
+
+Test files are located in `src/__tests__/` and follow the pattern `*.test.ts`.
+
+### Docker Development
+
+Build and run with Docker:
+
+```bash
+# Build Docker image
+docker build -t mcp-pdf-server .
+
+# Run with Docker
+docker run -i --rm \
+  --mount type=bind,src=/path/to/pdfs,dst=/pdfs \
+  mcp-pdf-server /pdfs
+```
+
+### Code Quality
+
+The project enforces code quality through:
+
+- **TypeScript**: Strong typing and compile-time error checking
+- **ESLint**: Code linting with TypeScript-specific rules
+- **Prettier**: Consistent code formatting
+- **Jest**: Comprehensive unit testing
+
+### Project Structure
+
+```
+mcp-pdf-server/
+├── src/
+│   ├── __tests__/          # Test files
+│   │   ├── lib.test.ts
+│   │   ├── path-utils.test.ts
+│   │   └── roots-utils.test.ts
+│   ├── index.ts            # Main server entry point
+│   ├── lib.ts              # Core functionality
+│   ├── path-utils.ts       # Path handling utilities
+│   ├── path-validation.ts  # Security validation
+│   └── roots-utils.ts      # MCP roots support
+├── dist/                   # Compiled JavaScript (generated)
+├── coverage/               # Test coverage reports (generated)
+├── package.json            # Dependencies and scripts
+├── tsconfig.json          # TypeScript configuration
+├── jest.config.cjs        # Jest testing configuration
+├── .eslintrc.cjs          # ESLint configuration
+├── .prettierrc            # Prettier configuration
+├── Dockerfile             # Docker build configuration
+└── README.md
+```
+
+### Publishing
+
+The package is automatically built before publishing:
+
+```bash
+# Prepare for publishing (runs build automatically)
+npm run prepare
+
+# Publish to npm
+npm publish
 ```
 
 ## Limitations
