@@ -30,7 +30,11 @@ describe('Path Utilities', () => {
     it('normalizes relative path components', () => {
       const input = '/home/user/../documents/./file.pdf';
       const result = normalizePath(input);
-      expect(result).toBe('/home/documents/file.pdf');
+      // On Windows, forward slashes get converted to backslashes
+      const expected = process.platform === 'win32' 
+        ? '\\home\\documents\\file.pdf' 
+        : '/home/documents/file.pdf';
+      expect(result).toBe(expected);
     });
 
     it('handles Windows-style paths', () => {

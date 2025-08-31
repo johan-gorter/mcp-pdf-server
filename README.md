@@ -1,5 +1,13 @@
 # PDF MCP Server
 
+**DISCLAIMER**
+This project has been written using Claude AI, with [@modelcontextprotocol/server-filesystem](https://github.com/modelcontextprotocol/servers/tree/main/src/filesystem) as an example and reference. I personally have not read all the code and cannot vouch for its security or correctness. Use at your own risk.
+
+[![CI](https://github.com/johan-gorter/mcp-pdf-server/actions/workflows/ci.yml/badge.svg)](https://github.com/johan-gorter/mcp-pdf-server/actions/workflows/ci.yml)
+[![Release](https://github.com/johan-gorter/mcp-pdf-server/actions/workflows/release.yml/badge.svg)](https://github.com/johan-gorter/mcp-pdf-server/actions/workflows/release.yml)
+[![npm version](https://badge.fury.io/js/@johangorter%2Fmcp-pdf-server.svg)](https://badge.fury.io/js/@johangorter%2Fmcp-pdf-server)
+[![Docker Image](https://ghcr-badge.egpl.dev/johan-gorter/mcp-pdf-server/latest_tag?trim=major&label=docker)](https://github.com/johan-gorter/mcp-pdf-server/pkgs/container/mcp-pdf-server)
+
 Node.js server implementing Model Context Protocol (MCP) for PDF text extraction operations. Built for Claude Desktop integration with secure directory access controls.
 
 Based on the patterns from [@modelcontextprotocol/server-filesystem](https://github.com/modelcontextprotocol/servers/tree/main/src/filesystem).
@@ -143,6 +151,54 @@ npm install
 npm run build
 ```
 
+### Continuous Integration
+
+This project uses GitHub Actions for automated testing and deployment:
+
+- **CI Pipeline**: Runs on every push and pull request
+  - Tests on Node.js 18.x, 20.x, 22.x
+  - Tests on Ubuntu, Windows, and macOS
+  - Runs linting, formatting checks, and tests
+  - Uploads test coverage to Codecov
+
+- **Release Pipeline**: Triggers on version tags (e.g., `v1.2.3`)
+  - Automatically publishes to npm
+  - Creates GitHub releases with changelog
+  - Builds and publishes Docker images
+
+### Release Process
+
+This project uses semantic versioning. To create a new release:
+
+```bash
+# For bug fixes (1.0.0 -> 1.0.1)
+npm run release:patch
+
+# For new features (1.0.0 -> 1.1.0)
+npm run release:minor
+
+# For breaking changes (1.0.0 -> 2.0.0)
+npm run release:major
+```
+
+These commands will:
+1. Run tests to ensure quality
+2. Bump version in package.json
+3. Create git commit and tag
+4. Push to GitHub (triggering automated release)
+
+### Manual Version Management
+
+You can also manage versions manually:
+
+```bash
+# Update version and create tag
+npm version patch|minor|major
+
+# Push with tags
+git push && git push --tags
+```
+
 ### Development Scripts
 
 ```bash
@@ -215,6 +271,18 @@ docker build -t mcp-pdf-server .
 docker run -i --rm \
   --mount type=bind,src=/path/to/pdfs,dst=/pdfs \
   mcp-pdf-server /pdfs
+```
+
+Or use the pre-built Docker image:
+
+```bash
+# Pull from GitHub Container Registry
+docker pull ghcr.io/johan-gorter/mcp-pdf-server:latest
+
+# Run the container
+docker run -i --rm \
+  --mount type=bind,src=/path/to/pdfs,dst=/pdfs \
+  ghcr.io/johan-gorter/mcp-pdf-server:latest /pdfs
 ```
 
 ### Code Quality
