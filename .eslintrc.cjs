@@ -8,7 +8,7 @@ module.exports = {
   plugins: ['@typescript-eslint'],
   extends: [
     'eslint:recommended',
-    '@typescript-eslint/recommended',
+    'plugin:@typescript-eslint/recommended',
   ],
   env: {
     node: true,
@@ -24,4 +24,15 @@ module.exports = {
     'no-var': 'error',
   },
   ignorePatterns: ['dist/', 'node_modules/', '*.js', '*.cjs'],
+  overrides: [
+    {
+      files: ['**/*.test.ts', '**/__tests__/**/*.ts'],
+      parserOptions: {
+        project: null,
+      },
+      rules: {
+        '@typescript-eslint/no-explicit-any': 'off',
+      },
+    },
+  ],
 };

@@ -165,7 +165,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 });
 
 // Roots protocol handlers
-server.setNotificationHandler(RootsListChangedNotificationSchema, async (notification) => {
+server.setNotificationHandler(RootsListChangedNotificationSchema, async (_notification) => {
   try {
     const response = await server.listRoots();
     if (response && 'roots' in response) {
