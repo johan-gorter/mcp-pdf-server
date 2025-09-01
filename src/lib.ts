@@ -1,6 +1,6 @@
-import fs from "fs/promises";
-import path from "path";
-import PDFParse from "pdf-parse";
+import fs from 'fs/promises';
+import path from 'path';
+import PDFParse from 'pdf-parse';
 import { normalizePath, expandHome } from './path-utils.js';
 import { isPathWithinAllowedDirectories } from './path-validation.js';
 
@@ -29,7 +29,9 @@ export async function validatePath(requestedPath: string): Promise<string> {
   // Security: Check if path is within allowed directories before any file operations
   const isAllowed = isPathWithinAllowedDirectories(normalizedRequested, allowedDirectories);
   if (!isAllowed) {
-    throw new Error(`Access denied - path outside allowed directories: ${absolute} not in ${allowedDirectories.join(', ')}`);
+    throw new Error(
+      `Access denied - path outside allowed directories: ${absolute} not in ${allowedDirectories.join(', ')}`
+    );
   }
 
   // Security: Handle symlinks by checking their real path to prevent symlink attacks
@@ -50,7 +52,9 @@ export async function validatePath(requestedPath: string): Promise<string> {
         const realParentPath = await fs.realpath(parentDir);
         const normalizedParent = normalizePath(realParentPath);
         if (!isPathWithinAllowedDirectories(normalizedParent, allowedDirectories)) {
-          throw new Error(`Access denied - parent directory outside allowed directories: ${realParentPath}`);
+          throw new Error(
+            `Access denied - parent directory outside allowed directories: ${realParentPath}`
+          );
         }
         return normalizedRequested;
       } catch (parentError: any) {
@@ -69,13 +73,13 @@ export async function extractPdfText(filePath: string, maxChars?: number): Promi
   try {
     const pdfBuffer = await fs.readFile(filePath);
     const data = await PDFParse(pdfBuffer);
-    
+
     let text = data.text;
-    
+
     if (maxChars && maxChars > 0 && text.length > maxChars) {
       text = text.substring(0, maxChars) + '... [truncated]';
     }
-    
+
     return text;
   } catch (error) {
     if (error instanceof Error) {

@@ -32,7 +32,7 @@ Add to your `claude_desktop_config.json`:
     "pdf-reader": {
       "command": "npx",
       "args": [
-        "-y", 
+        "-y",
         "@johangorter/mcp-pdf-server",
         "/Users/username/Desktop",
         "/Users/username/Downloads"
@@ -59,10 +59,12 @@ The server provides one tool:
 Extract text content from PDF files with optional character limiting.
 
 **Parameters:**
+
 - `path` (string, required): Path to PDF file within allowed directories
 - `max_chars` (number, optional): Maximum characters to return (default: unlimited)
 
 **Example:**
+
 ```typescript
 // Claude will call this tool when you ask:
 // "Extract the first 1000 characters from report.pdf"
@@ -78,24 +80,28 @@ Extract text content from PDF files with optional character limiting.
 ## Design Decisions
 
 ### Why Node.js?
+
 - **Ecosystem Alignment**: Reuses patterns from official filesystem MCP server
 - **Claude Desktop Integration**: Built-in Node.js support, no external dependencies
 - **Fast Deployment**: NPX distribution, no Python environment setup
 - **Code Reuse**: 80% shared logic with filesystem server for directory validation
 
 ### Why Single Tool?
+
 - **Focused Scope**: PDF text extraction covers 80% of use cases
 - **Token Efficiency**: max_chars prevents context overflow
 - **Simplicity**: Easier to maintain and debug
 - **Extensible**: Foundation for future PDF features
 
 ### Security Model
+
 - **Directory Sandboxing**: Inherits filesystem server's access controls
-- **Path Validation**: Prevents directory traversal attacks  
+- **Path Validation**: Prevents directory traversal attacks
 - **File Type Filtering**: Only processes .pdf files
 - **Error Handling**: Standard MCP error codes for consistency
 
 ### Technical Stack
+
 - **PDF Processing**: `pdf-parse` - reliable, fast, minimal dependencies
 - **MCP SDK**: `@modelcontextprotocol/sdk` ^1.17.0
 - **TypeScript**: Type safety and IDE support
@@ -104,6 +110,7 @@ Extract text content from PDF files with optional character limiting.
 ## Configuration
 
 ### Directory Access
+
 Specify allowed directories as command-line arguments:
 
 ```bash
@@ -111,11 +118,13 @@ npx @johangorter/mcp-pdf-server /path/to/documents /path/to/pdfs
 ```
 
 ### Roots Protocol Support
+
 The server supports dynamic directory updates via MCP Roots protocol, enabling runtime directory changes without restart.
 
 ## Error Handling
 
 Standard MCP error codes:
+
 - `-32602`: Invalid params (file not found, invalid path)
 - `-32603`: Internal error (PDF parsing failed, file corrupted)
 
@@ -133,7 +142,7 @@ Standard MCP error codes:
 
 ### Prerequisites
 
-- Node.js 16+ 
+- Node.js 16+
 - npm or yarn
 - TypeScript
 
@@ -182,6 +191,7 @@ npm run release:major
 ```
 
 These commands will:
+
 1. Run tests to ensure quality
 2. Bump version in package.json
 3. Create git commit and tag
@@ -341,6 +351,7 @@ npm publish
 ## Future Extensions
 
 Potential expansions while maintaining simplicity:
+
 - `extract_pdf_metadata` - Document properties
 - `extract_pdf_pages` - Specific page ranges
 - OCR support for scanned documents

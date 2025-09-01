@@ -1,11 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals';
 import fs from 'fs/promises';
 import path from 'path';
-import {
-  setAllowedDirectories,
-  validatePath,
-  extractPdfText,
-} from '../lib.js';
+import { setAllowedDirectories, validatePath, extractPdfText } from '../lib.js';
 
 // Mock fs module
 jest.mock('fs/promises');
@@ -13,16 +9,19 @@ const mockFs = fs as jest.Mocked<typeof fs>;
 
 // Mock pdf-parse
 jest.mock('pdf-parse', () => {
-  return jest.fn().mockImplementation(() => Promise.resolve({
-    text: 'Sample PDF text content for testing'
-  }));
+  return jest.fn().mockImplementation(() =>
+    Promise.resolve({
+      text: 'Sample PDF text content for testing',
+    })
+  );
 });
 
 describe('Lib Functions', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     // Set up allowed directories for tests
-    const allowedDirs = process.platform === 'win32' ? ['C:\\Users\\test', 'C:\\temp'] : ['/home/user', '/tmp'];
+    const allowedDirs =
+      process.platform === 'win32' ? ['C:\\Users\\test', 'C:\\temp'] : ['/home/user', '/tmp'];
     setAllowedDirectories(allowedDirs);
   });
 
@@ -33,36 +32,39 @@ describe('Lib Functions', () => {
   });
 
   describe('validatePath', () => {
-    const allowedDirs = process.platform === 'win32' ? ['C:\\Users\\test', 'C:\\temp'] : ['/home/user', '/tmp'];
+    const allowedDirs =
+      process.platform === 'win32' ? ['C:\\Users\\test', 'C:\\temp'] : ['/home/user', '/tmp'];
 
     beforeEach(() => {
       mockFs.realpath.mockImplementation(async (path: any) => path.toString());
     });
 
     it('validates allowed paths', async () => {
-      const testPath = process.platform === 'win32' ? 'C:\\Users\\test\\file.pdf' : '/home/user/file.pdf';
+      const testPath =
+        process.platform === 'win32' ? 'C:\\Users\\test\\file.pdf' : '/home/user/file.pdf';
       const result = await validatePath(testPath);
       expect(result).toBe(testPath);
     });
 
     it('rejects disallowed paths', async () => {
-      const testPath = process.platform === 'win32' ? 'C:\\Windows\\System32\\file.pdf' : '/etc/passwd.pdf';
-      await expect(validatePath(testPath))
-        .rejects.toThrow('Access denied - path outside allowed directories');
+      const testPath =
+        process.platform === 'win32' ? 'C:\\Windows\\System32\\file.pdf' : '/etc/passwd.pdf';
+      await expect(validatePath(testPath)).rejects.toThrow(
+        'Access denied - path outside allowed directories'
+      );
     });
 
     it('handles non-existent files by checking parent directory', async () => {
-      const newFilePath = process.platform === 'win32' ? 'C:\\Users\\test\\newfile.pdf' : '/home/user/newfile.pdf';
+      const newFilePath =
+        process.platform === 'win32' ? 'C:\\Users\\test\\newfile.pdf' : '/home/user/newfile.pdf';
       const parentPath = process.platform === 'win32' ? 'C:\\Users\\test' : '/home/user';
-      
+
       // Create an error with the ENOENT code that the implementation checks for
       const enoentError = new Error('ENOENT') as NodeJS.ErrnoException;
       enoentError.code = 'ENOENT';
-      
-      mockFs.realpath
-        .mockRejectedValueOnce(enoentError)
-        .mockResolvedValueOnce(parentPath);
-      
+
+      mockFs.realpath.mockRejectedValueOnce(enoentError).mockResolvedValueOnce(parentPath);
+
       const result = await validatePath(newFilePath);
       expect(result).toBe(path.resolve(newFilePath));
     });
@@ -93,8 +95,9 @@ describe('Lib Functions', () => {
       const PDFParse = require('pdf-parse');
       PDFParse.mockRejectedValueOnce(new Error('Invalid PDF'));
 
-      await expect(extractPdfText('/test/invalid.pdf'))
-        .rejects.toThrow('Failed to extract text from PDF: Invalid PDF');
+      await expect(extractPdfText('/test/invalid.pdf')).rejects.toThrow(
+        'Failed to extract text from PDF: Invalid PDF'
+      );
     });
   });
 });

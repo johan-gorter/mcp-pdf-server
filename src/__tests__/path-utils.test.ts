@@ -4,25 +4,20 @@ import { normalizePath, expandHome, convertToWindowsPath } from '../path-utils.j
 describe('Path Utilities', () => {
   describe('convertToWindowsPath', () => {
     it('leaves Unix paths unchanged', () => {
-      expect(convertToWindowsPath('/usr/local/bin'))
-        .toBe('/usr/local/bin');
-      expect(convertToWindowsPath('/home/user/some path'))
-        .toBe('/home/user/some path');
+      expect(convertToWindowsPath('/usr/local/bin')).toBe('/usr/local/bin');
+      expect(convertToWindowsPath('/home/user/some path')).toBe('/home/user/some path');
     });
 
     it('converts WSL paths to Windows format', () => {
-      expect(convertToWindowsPath('/mnt/c/documents/file.pdf'))
-        .toBe('C:\\documents\\file.pdf');
+      expect(convertToWindowsPath('/mnt/c/documents/file.pdf')).toBe('C:\\documents\\file.pdf');
     });
 
     it('converts Unix-style Windows paths to Windows format', () => {
-      expect(convertToWindowsPath('/c/documents/file.pdf'))
-        .toBe('C:\\documents\\file.pdf');
+      expect(convertToWindowsPath('/c/documents/file.pdf')).toBe('C:\\documents\\file.pdf');
     });
 
     it('leaves Windows paths unchanged but ensures backslashes', () => {
-      expect(convertToWindowsPath('C:/documents/file.pdf'))
-        .toBe('C:\\documents\\file.pdf');
+      expect(convertToWindowsPath('C:/documents/file.pdf')).toBe('C:\\documents\\file.pdf');
     });
   });
 
@@ -31,9 +26,8 @@ describe('Path Utilities', () => {
       const input = '/home/user/../documents/./file.pdf';
       const result = normalizePath(input);
       // On Windows, forward slashes get converted to backslashes
-      const expected = process.platform === 'win32' 
-        ? '\\home\\documents\\file.pdf' 
-        : '/home/documents/file.pdf';
+      const expected =
+        process.platform === 'win32' ? '\\home\\documents\\file.pdf' : '/home/documents/file.pdf';
       expect(result).toBe(expected);
     });
 

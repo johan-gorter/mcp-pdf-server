@@ -34,7 +34,7 @@ describe('getValidRootDirectories', () => {
       const roots = [
         { uri: `file://${testDir1}`, name: 'File URI' },
         { uri: testDir2, name: 'Plain path' },
-        { uri: testDir3 } // Plain path without name property
+        { uri: testDir3 }, // Plain path without name property
       ];
 
       const result = await getValidRootDirectories(roots);
@@ -49,10 +49,8 @@ describe('getValidRootDirectories', () => {
       // Create a subdirectory for testing path normalization
       const subDir = join(testDir1, 'subdir');
       mkdirSync(subDir);
-      
-      const roots = [
-        { uri: `file://${testDir1}/./subdir/../subdir`, name: 'Complex Path' }
-      ];
+
+      const roots = [{ uri: `file://${testDir1}/./subdir/../subdir`, name: 'Complex Path' }];
 
       const result = await getValidRootDirectories(roots);
 
@@ -69,7 +67,7 @@ describe('getValidRootDirectories', () => {
         { uri: `file://${testDir1}`, name: 'Valid Dir' },
         { uri: `file://${nonExistentDir}`, name: 'Non-existent Dir' },
         { uri: `file://${testFile}`, name: 'File Not Dir' },
-        { uri: `file://${invalidPath}`, name: 'Invalid Path' }
+        { uri: `file://${invalidPath}`, name: 'Invalid Path' },
       ];
 
       const result = await getValidRootDirectories(roots);

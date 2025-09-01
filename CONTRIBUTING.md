@@ -5,17 +5,20 @@ Thank you for your interest in contributing to the MCP PDF Server project!
 ## Development Setup
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/johan-gorter/mcp-pdf-server.git
    cd mcp-pdf-server
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    ```
 
 3. **Build the project**
+
    ```bash
    npm run build
    ```
@@ -28,21 +31,25 @@ Thank you for your interest in contributing to the MCP PDF Server project!
 ## Development Workflow
 
 ### Running in Development Mode
+
 ```bash
 npm run dev
 ```
 
 ### Watch Mode for Development
+
 ```bash
 npm run watch
 ```
 
 ### Code Quality
+
 - **Linting**: `npm run lint` or `npm run lint:fix`
 - **Formatting**: `npm run format` or `npm run format:check`
 - **Type Checking**: `npm run type-check`
 
 ### Testing
+
 - **Run tests**: `npm test`
 - **Watch mode**: `npm run test:watch`
 - **Coverage**: `npm run test:coverage`
@@ -50,25 +57,29 @@ npm run watch
 ## Release Process
 
 ### Semantic Versioning
+
 This project follows [Semantic Versioning](https://semver.org/). Use the following scripts for releases:
 
 - **Patch release** (bug fixes): `npm run release:patch`
-- **Minor release** (new features): `npm run release:minor`  
+- **Minor release** (new features): `npm run release:minor`
 - **Major release** (breaking changes): `npm run release:major`
 
 These scripts will:
+
 1. Run tests to ensure quality
 2. Bump the version in `package.json`
 3. Create a git commit and tag
 4. Push to GitHub (triggering CI/CD)
 
 ### Manual Release Steps
+
 If you prefer manual control:
 
 1. **Update version**: `npm version [patch|minor|major]`
 2. **Push changes**: `git push && git push --tags`
 
 The GitHub Actions workflow will automatically:
+
 - Run CI tests
 - Create a GitHub release
 - Publish to npm
@@ -96,11 +107,13 @@ The GitHub Actions workflow will automatically:
 ## Docker Development
 
 ### Building the Docker Image
+
 ```bash
 docker build -t mcp-pdf-server .
 ```
 
 ### Running with Docker
+
 ```bash
 docker run -it --rm mcp-pdf-server
 ```
