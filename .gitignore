@@ -55,3 +55,5 @@ Thumbs.db
 
 # Test files
 .jest/
+test/
+test/**
