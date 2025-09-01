@@ -15,12 +15,7 @@ module.exports = {
     ],
   },
   testMatch: ['**/__tests__/**/*.test.ts'],
-  collectCoverageFrom: [
-    'src/**/*.ts',
-    '!src/**/__tests__/**',
-    '!src/**/dist/**',
-    '!src/**/*.d.ts',
-  ],
+  collectCoverageFrom: ['src/**/*.ts', '!src/**/__tests__/**', '!src/**/dist/**', '!src/**/*.d.ts'],
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'lcov', 'html'],
   setupFilesAfterEnv: [],
