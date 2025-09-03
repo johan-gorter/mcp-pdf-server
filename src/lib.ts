@@ -19,7 +19,7 @@ export function getAllowedDirectories(): string[] {
 // Security & Validation Functions
 export async function validatePath(requestedPath: string): Promise<string> {
   const expandedPath = expandHome(requestedPath);
-  
+
   let absolute: string;
   if (path.isAbsolute(expandedPath)) {
     absolute = path.resolve(expandedPath);
@@ -27,24 +27,24 @@ export async function validatePath(requestedPath: string): Promise<string> {
     // For relative paths, try to resolve them within each allowed directory
     // This allows relative paths like "examples/file.pdf" to work within allowed dirs
     let resolvedPath: string | null = null;
-    
+
     for (const allowedDir of allowedDirectories) {
       const candidatePath = path.resolve(allowedDir, expandedPath);
       const normalizedCandidate = normalizePath(candidatePath);
-      
+
       // Check if this candidate path is within the allowed directory
       if (isPathWithinAllowedDirectories(normalizedCandidate, [allowedDir])) {
         resolvedPath = candidatePath;
         break;
       }
     }
-    
+
     if (!resolvedPath) {
       throw new Error(
         `Access denied - relative path "${requestedPath}" could not be resolved within any allowed directory: ${allowedDirectories.join(', ')}`
       );
     }
-    
+
     absolute = resolvedPath;
   }
 
@@ -82,7 +82,11 @@ export async function validatePath(requestedPath: string): Promise<string> {
         }
         return normalizedRequested;
       } catch (parentError: unknown) {
-        if (parentError instanceof Error && 'code' in parentError && parentError.code === 'ENOENT') {
+        if (
+          parentError instanceof Error &&
+          'code' in parentError &&
+          parentError.code === 'ENOENT'
+        ) {
           throw new Error('Parent directory does not exist');
         }
         throw parentError;
@@ -96,7 +100,7 @@ export async function validatePath(requestedPath: string): Promise<string> {
 export async function extractPdfText(filePath: string, maxChars?: number): Promise<string> {
   try {
     const { extractText } = await import('unpdf');
-    
+
     const pdfBuffer = await fs.readFile(filePath);
     // Convert Buffer to Uint8Array as required by unpdf
     const uint8Array = new Uint8Array(pdfBuffer);

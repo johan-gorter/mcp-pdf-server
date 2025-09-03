@@ -24,44 +24,45 @@ Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saep
 
 function generateExamplePDF() {
   const outputPath = path.join(__dirname, 'examples', 'lorem-ipsum.pdf');
-  
+
   // Create a new PDF document
   const doc = new PDFDocument();
-  
+
   // Pipe the PDF to a file
   doc.pipe(fs.createWriteStream(outputPath));
-  
+
   // Add title
-  doc.fontSize(20)
-     .text('Lorem Ipsum Document', { align: 'center' });
-  
+  doc.fontSize(20).text('Lorem Ipsum Document', { align: 'center' });
+
   doc.moveDown();
-  
+
   // Add main content
-  doc.fontSize(12)
-     .text(loremIpsumText, {
-       align: 'justify',
-       lineGap: 5
-     });
-  
+  doc.fontSize(12).text(loremIpsumText, {
+    align: 'justify',
+    lineGap: 5,
+  });
+
   doc.moveDown();
-  
+
   // Add a second page with more content
-  doc.addPage()
-     .fontSize(16)
-     .text('Second Page', { align: 'center' });
-  
+  doc.addPage().fontSize(16).text('Second Page', { align: 'center' });
+
   doc.moveDown();
-  
-  doc.fontSize(12)
-     .text('This is additional content on the second page to test multi-page PDF extraction. ' + loremIpsumText.substring(0, 500), {
-       align: 'justify',
-       lineGap: 5
-     });
-  
+
+  doc
+    .fontSize(12)
+    .text(
+      'This is additional content on the second page to test multi-page PDF extraction. ' +
+        loremIpsumText.substring(0, 500),
+      {
+        align: 'justify',
+        lineGap: 5,
+      }
+    );
+
   // Finalize the PDF
   doc.end();
-  
+
   console.log(`Generated example PDF at: ${outputPath}`);
 }
 
