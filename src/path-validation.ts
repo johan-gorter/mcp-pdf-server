@@ -1,4 +1,4 @@
-import path from "path";
+import path from 'path';
 
 /**
  * Validates if a path is within the allowed directories
@@ -16,12 +16,12 @@ export function isPathWithinAllowedDirectories(
 
   const normalizedRequestedPath = path.resolve(requestedPath);
 
-  return allowedDirectories.some(allowedDir => {
+  return allowedDirectories.some((allowedDir) => {
     const normalizedAllowedDir = path.resolve(allowedDir);
-    
+
     // Check if the requested path is the same as or within the allowed directory
     const relativePath = path.relative(normalizedAllowedDir, normalizedRequestedPath);
-    
+
     // Path is valid if:
     // 1. relative path doesn't start with '..' (not going up from allowed dir)
     // 2. relative path doesn't start with path separator (absolute path outside)

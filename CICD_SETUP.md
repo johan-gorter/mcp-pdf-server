@@ -88,10 +88,12 @@ The project now includes a comprehensive GitHub Actions setup that follows indus
 ### Continuous Integration (CI)
 
 **Triggers:**
+
 - Push to main or develop branches
 - Pull requests to main or develop branches
 
 **Jobs:**
+
 - **Test Matrix**: Tests across Node.js versions (18, 20, 22) and OS (Ubuntu, Windows, macOS)
 - **Build Validation**: Ensures package builds correctly and can be installed
 - **Code Quality**: Linting, formatting, and type checking
@@ -100,9 +102,11 @@ The project now includes a comprehensive GitHub Actions setup that follows indus
 ### Release Automation
 
 **Triggers:**
+
 - Git tags matching `v*` pattern (e.g., `v1.2.3`)
 
 **Process:**
+
 1. Validates that package.json version matches the git tag
 2. Runs full test suite
 3. Extracts changelog section for the version
@@ -114,10 +118,12 @@ The project now includes a comprehensive GitHub Actions setup that follows indus
 ### Security Monitoring
 
 **Triggers:**
+
 - Push/PR to main or develop branches
 - Weekly schedule (Mondays at 8:00 AM UTC)
 
 **Features:**
+
 - npm audit for vulnerability detection
 - Dependency freshness checks
 - Audit report generation and archival
@@ -151,6 +157,7 @@ npm run release:major
 ```
 
 These commands will:
+
 1. Run tests to ensure quality
 2. Bump the version in package.json
 3. Create a git commit and tag
@@ -195,6 +202,7 @@ docker run -i --rm \
 ## Badge Configuration
 
 The README now includes status badges:
+
 - CI build status
 - Release workflow status
 - npm package version
@@ -203,6 +211,7 @@ The README now includes status badges:
 ## Dependency Management
 
 Dependabot is configured to:
+
 - Check for dependency updates weekly
 - Create pull requests for outdated packages
 - Update GitHub Actions to latest versions
