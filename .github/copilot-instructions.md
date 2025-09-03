@@ -19,14 +19,6 @@ npm run build
 npm test
 ```
 
-**CRITICAL WORKAROUND**: The pdf-parse dependency has a development issue that requires creating a test directory structure before running the server:
-
-```bash
-# Required workaround for pdf-parse library
-mkdir -p test/data
-echo "dummy" > test/data/05-versions-space.pdf
-```
-
 ## Running the Server
 
 ```bash
@@ -106,9 +98,8 @@ npm run lint && npm run format && npm run type-check
 After making any changes, ALWAYS run this complete validation:
 
 ```bash
-# 1. Install and build (required workaround)
+# 1. Install and build
 npm install
-mkdir -p test/data && echo "dummy" > test/data/05-versions-space.pdf
 npm run build
 
 # 2. Run all tests and quality checks
@@ -124,7 +115,7 @@ timeout 5s node dist/index.js /tmp/test_pdfs
 # Should output: "Warning: Indexing all PDF objects" and "MCP PDF Server running on stdio"
 
 # 4. Clean up test files
-rm -rf test/ /tmp/test_pdfs
+rm -rf /tmp/test_pdfs
 ```
 
 ### Manual Functional Testing
@@ -158,16 +149,6 @@ Key directories and files:
 ```
 
 ## Common Issues and Workarounds
-
-### pdf-parse Library Issue
-
-**Problem**: Server crashes with "ENOENT: no such file or directory, open './test/data/05-versions-space.pdf'"
-
-**Solution**: Always create the test directory structure before running:
-
-```bash
-mkdir -p test/data && echo "dummy" > test/data/05-versions-space.pdf
-```
 
 ### Docker Build Issues
 
@@ -205,7 +186,7 @@ The project uses GitHub Actions with these workflows:
 ### Runtime Dependencies
 
 - `@modelcontextprotocol/sdk`: MCP protocol implementation
-- `pdf-parse`: PDF text extraction (has development quirks)
+- `pdf-parse`: PDF text extraction
 - `zod`: Schema validation
 - `zod-to-json-schema`: Schema conversion
 

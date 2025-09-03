@@ -1,6 +1,5 @@
 import fs from 'fs/promises';
 import path from 'path';
-import PDFParse from 'pdf-parse';
 import { normalizePath, expandHome } from './path-utils.js';
 import { isPathWithinAllowedDirectories } from './path-validation.js';
 
@@ -43,10 +42,10 @@ export async function validatePath(requestedPath: string): Promise<string> {
       throw new Error(`Access denied - symlink target outside allowed directories: ${realPath}`);
     }
     return normalizedReal;
-  } catch (error: any) {
+  } catch (error: unknown) {
     // If realpath fails with ENOENT, the file doesn't exist yet
     // Check if the parent directory is valid and return the normalized path
-    if (error.code === 'ENOENT') {
+    if (error instanceof Error && 'code' in error && error.code === 'ENOENT') {
       const parentDir = path.dirname(absolute);
       try {
         const realParentPath = await fs.realpath(parentDir);
@@ -57,8 +56,8 @@ export async function validatePath(requestedPath: string): Promise<string> {
           );
         }
         return normalizedRequested;
-      } catch (parentError: any) {
-        if (parentError.code === 'ENOENT') {
+      } catch (parentError: unknown) {
+        if (parentError instanceof Error && 'code' in parentError && parentError.code === 'ENOENT') {
           throw new Error('Parent directory does not exist');
         }
         throw parentError;
@@ -71,6 +70,9 @@ export async function validatePath(requestedPath: string): Promise<string> {
 // PDF Text Extraction Function
 export async function extractPdfText(filePath: string, maxChars?: number): Promise<string> {
   try {
+    // Lazy load pdf-parse to avoid running its debug code on module load
+    const PDFParse = (await import('pdf-parse')).default;
+    
     const pdfBuffer = await fs.readFile(filePath);
     const data = await PDFParse(pdfBuffer);
 
