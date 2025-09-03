@@ -1,9 +1,9 @@
-# Node modules
-node_modules
+# Node modules - we'll copy this explicitly
+# node_modules
 npm-debug.log*
 
-# Build output
-dist
+# Build output - we'll copy this explicitly  
+# dist
 
 # Development files
 .git

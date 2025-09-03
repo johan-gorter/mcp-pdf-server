@@ -1,43 +1,21 @@
-FROM node:22.12-alpine AS builder
+FROM node:22-slim
 
 WORKDIR /app
 
-# Copy package files
+# Copy everything including built dist and node_modules
+COPY dist ./dist
+COPY node_modules ./node_modules
 COPY package*.json ./
 
-# Install dependencies
-RUN --mount=type=cache,target=/root/.npm npm ci
-
-# Copy source code
-COPY . .
-
-# Build the project
-RUN npm run build
-
-# Production stage
-FROM node:22-alpine AS release
-
-WORKDIR /app
-
-# Copy package files
-COPY package*.json ./
-
-# Install production dependencies only
-ENV NODE_ENV=production
-RUN --mount=type=cache,target=/root/.npm npm ci --omit=dev
-
-# Copy built application from builder stage
-COPY --from=builder /app/dist ./dist
+# Create the workaround directory structure for pdf-parse library
+RUN mkdir -p test/data && echo "dummy" > test/data/05-versions-space.pdf
 
 # Create non-root user for security
-RUN addgroup -g 1001 -S nodejs && \
-    adduser -S mcp -u 1001
+RUN groupadd -g 1001 nodejs && \
+    useradd -u 1001 -g nodejs mcp
 
-# Change to non-root user
+# Change to non-root user  
 USER mcp
-
-# Expose port (if needed for debugging/health checks)
-EXPOSE 3000
 
 # Set the entrypoint
 ENTRYPOINT ["node", "dist/index.js"]
