@@ -1,9 +1,5 @@
-# Node modules
-node_modules
-npm-debug.log*
-
-# Build output
-dist
+# Build output - allow copying dist
+# dist
 
 # Development files
 .git

@@ -1,43 +1,17 @@
-FROM node:22.12-alpine AS builder
+# Simple single-stage Dockerfile that works by copying pre-built assets
+# For development, run: npm run build && docker build -t mcp-pdf-server .
+
+FROM node:18-alpine
 
 WORKDIR /app
 
-# Copy package files
+# Copy pre-built application and all dependencies
+COPY dist ./dist
+COPY node_modules ./node_modules
 COPY package*.json ./
 
-# Install dependencies
-RUN --mount=type=cache,target=/root/.npm npm ci
-
-# Copy source code
-COPY . .
-
-# Build the project
-RUN npm run build
-
-# Production stage
-FROM node:22-alpine AS release
-
-WORKDIR /app
-
-# Copy package files
-COPY package*.json ./
-
-# Install production dependencies only
-ENV NODE_ENV=production
-RUN --mount=type=cache,target=/root/.npm npm ci --omit=dev
-
-# Copy built application from builder stage
-COPY --from=builder /app/dist ./dist
-
-# Create non-root user for security
-RUN addgroup -g 1001 -S nodejs && \
-    adduser -S mcp -u 1001
-
-# Change to non-root user
-USER mcp
-
-# Expose port (if needed for debugging/health checks)
-EXPOSE 3000
+# Create the workaround directory structure for pdf-parse library
+RUN mkdir -p test/data && echo "dummy" > test/data/05-versions-space.pdf
 
 # Set the entrypoint
 ENTRYPOINT ["node", "dist/index.js"]
