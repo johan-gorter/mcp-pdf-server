@@ -1,6 +1,5 @@
 import fs from 'fs/promises';
 import path from 'path';
-import PDFParse from 'pdf-parse';
 import { normalizePath, expandHome } from './path-utils.js';
 import { isPathWithinAllowedDirectories } from './path-validation.js';
 
@@ -20,9 +19,34 @@ export function getAllowedDirectories(): string[] {
 // Security & Validation Functions
 export async function validatePath(requestedPath: string): Promise<string> {
   const expandedPath = expandHome(requestedPath);
-  const absolute = path.isAbsolute(expandedPath)
-    ? path.resolve(expandedPath)
-    : path.resolve(process.cwd(), expandedPath);
+
+  let absolute: string;
+  if (path.isAbsolute(expandedPath)) {
+    absolute = path.resolve(expandedPath);
+  } else {
+    // For relative paths, try to resolve them within each allowed directory
+    // This allows relative paths like "examples/file.pdf" to work within allowed dirs
+    let resolvedPath: string | null = null;
+
+    for (const allowedDir of allowedDirectories) {
+      const candidatePath = path.resolve(allowedDir, expandedPath);
+      const normalizedCandidate = normalizePath(candidatePath);
+
+      // Check if this candidate path is within the allowed directory
+      if (isPathWithinAllowedDirectories(normalizedCandidate, [allowedDir])) {
+        resolvedPath = candidatePath;
+        break;
+      }
+    }
+
+    if (!resolvedPath) {
+      throw new Error(
+        `Access denied - relative path "${requestedPath}" could not be resolved within any allowed directory: ${allowedDirectories.join(', ')}`
+      );
+    }
+
+    absolute = resolvedPath;
+  }
 
   const normalizedRequested = normalizePath(absolute);
 
@@ -43,10 +67,10 @@ export async function validatePath(requestedPath: string): Promise<string> {
       throw new Error(`Access denied - symlink target outside allowed directories: ${realPath}`);
     }
     return normalizedReal;
-  } catch (error: any) {
+  } catch (error: unknown) {
     // If realpath fails with ENOENT, the file doesn't exist yet
     // Check if the parent directory is valid and return the normalized path
-    if (error.code === 'ENOENT') {
+    if (error instanceof Error && 'code' in error && error.code === 'ENOENT') {
       const parentDir = path.dirname(absolute);
       try {
         const realParentPath = await fs.realpath(parentDir);
@@ -57,8 +81,12 @@ export async function validatePath(requestedPath: string): Promise<string> {
           );
         }
         return normalizedRequested;
-      } catch (parentError: any) {
-        if (parentError.code === 'ENOENT') {
+      } catch (parentError: unknown) {
+        if (
+          parentError instanceof Error &&
+          'code' in parentError &&
+          parentError.code === 'ENOENT'
+        ) {
           throw new Error('Parent directory does not exist');
         }
         throw parentError;
@@ -71,16 +99,21 @@ export async function validatePath(requestedPath: string): Promise<string> {
 // PDF Text Extraction Function
 export async function extractPdfText(filePath: string, maxChars?: number): Promise<string> {
   try {
+    const { extractText } = await import('unpdf');
+
     const pdfBuffer = await fs.readFile(filePath);
-    const data = await PDFParse(pdfBuffer);
+    // Convert Buffer to Uint8Array as required by unpdf
+    const uint8Array = new Uint8Array(pdfBuffer);
+    const { text } = await extractText(uint8Array);
 
-    let text = data.text;
+    // unpdf returns an array of strings (one per page), so join them
+    let extractedText = Array.isArray(text) ? text.join('\n\n') : text;
 
-    if (maxChars && maxChars > 0 && text.length > maxChars) {
-      text = text.substring(0, maxChars) + '... [truncated]';
+    if (maxChars && maxChars > 0 && extractedText.length > maxChars) {
+      extractedText = extractedText.substring(0, maxChars) + '... [truncated]';
     }
 
-    return text;
+    return extractedText;
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(`Failed to extract text from PDF: ${error.message}`);
