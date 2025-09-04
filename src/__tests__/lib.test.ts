@@ -7,13 +7,15 @@ import { setAllowedDirectories, validatePath, extractPdfText } from '../lib.js';
 jest.mock('fs/promises');
 const mockFs = fs as jest.Mocked<typeof fs>;
 
-// Mock pdf-parse
-jest.mock('pdf-parse', () => {
-  return jest.fn().mockImplementation(() =>
-    Promise.resolve({
-      text: 'Sample PDF text content for testing',
-    })
-  );
+// Mock unpdf
+jest.mock('unpdf', () => {
+  return {
+    extractText: jest.fn().mockImplementation(() =>
+      Promise.resolve({
+        text: 'Sample PDF text content for testing',
+      })
+    ),
+  };
 });
 
 describe('Lib Functions', () => {
@@ -89,8 +91,8 @@ describe('Lib Functions', () => {
     });
 
     it('handles PDF parsing errors', async () => {
-      const { default: PDFParse } = await import('pdf-parse');
-      (PDFParse as jest.MockedFunction<typeof PDFParse>).mockRejectedValueOnce(
+      const { extractText } = await import('unpdf');
+      (extractText as jest.MockedFunction<typeof extractText>).mockRejectedValueOnce(
         new Error('Invalid PDF')
       );
 
