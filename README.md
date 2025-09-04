@@ -77,36 +77,6 @@ Extract text content from PDF files with optional character limiting.
 }
 ```
 
-## Design Decisions
-
-### Why Node.js?
-
-- **Ecosystem Alignment**: Reuses patterns from official filesystem MCP server
-- **Claude Desktop Integration**: Built-in Node.js support, no external dependencies
-- **Fast Deployment**: NPX distribution, no Python environment setup
-- **Code Reuse**: 80% shared logic with filesystem server for directory validation
-
-### Why Single Tool?
-
-- **Focused Scope**: PDF text extraction covers 80% of use cases
-- **Token Efficiency**: max_chars prevents context overflow
-- **Simplicity**: Easier to maintain and debug
-- **Extensible**: Foundation for future PDF features
-
-### Security Model
-
-- **Directory Sandboxing**: Inherits filesystem server's access controls
-- **Path Validation**: Prevents directory traversal attacks
-- **File Type Filtering**: Only processes .pdf files
-- **Error Handling**: Standard MCP error codes for consistency
-
-### Technical Stack
-
-- **PDF Processing**: `pdf-parse` - reliable, fast, minimal dependencies
-- **MCP SDK**: `@modelcontextprotocol/sdk` ^1.17.0
-- **TypeScript**: Type safety and IDE support
-- **Stdio Transport**: Local execution, secure communication
-
 ## Configuration
 
 ### Directory Access
