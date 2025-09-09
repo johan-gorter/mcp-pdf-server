@@ -16,31 +16,37 @@ The server implements a strict security model for file access:
 ### Protection Against Common Attacks
 
 #### 1. Path Traversal Attacks
+
 - **Description**: Attempts to access files outside allowed directories using `../` sequences
 - **Protection**: Path normalization and relative path validation prevent directory traversal
 - **Examples Blocked**: `../../../etc/passwd`, `allowed/../forbidden/file.pdf`
 
 #### 2. Symlink Attacks
+
 - **Description**: Creating symbolic links that point to files outside allowed directories
 - **Protection**: All symlinks are resolved using `fs.realpath()` and targets are validated
 - **Examples Blocked**: Symlinks pointing from allowed directories to `/etc/passwd`
 
 #### 3. TOCTOU (Time-of-Check-Time-of-Use) Attacks
+
 - **Description**: Race conditions between path validation and file access
 - **Protection**: Path re-validation occurs immediately before file operations
 - **Implementation**: `extractPdfText()` re-validates paths before reading files
 
 #### 4. Case Sensitivity Bypasses
+
 - **Description**: Using different case variations to bypass path validation on case-insensitive filesystems
 - **Protection**: Case-insensitive comparison on Windows and macOS platforms
 - **Examples Blocked**: `/ALLOWED/file.pdf` when allowed directory is `/allowed/`
 
 #### 5. Hard Link Attacks
+
 - **Description**: Hard links that reference files outside allowed directories
 - **Protection**: Detection of files with multiple hard links (nlink > 1)
 - **Implementation**: Warnings logged for potential hard link vulnerabilities
 
 #### 6. Encoding and Edge Cases
+
 - **Description**: Various encoding tricks and edge cases to bypass validation
 - **Protection**: Robust handling of null bytes, very long paths, and encoded characters
 
@@ -55,6 +61,7 @@ The server includes comprehensive security tests covering:
 - Edge cases (null bytes, long paths, case sensitivity)
 
 Run security tests with:
+
 ```bash
 npm test -- --testPathPattern=security.test.ts
 ```
