@@ -1,7 +1,10 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { normalizePath, expandHome } from './path-utils.js';
-import { isPathWithinAllowedDirectories } from './path-validation.js';
+import {
+  isPathWithinAllowedDirectories,
+  checkForHardLinkVulnerability,
+} from './path-validation.js';
 
 // Global allowed directories - set by the main module
 let allowedDirectories: string[] = [];
@@ -66,6 +69,10 @@ export async function validatePath(requestedPath: string): Promise<string> {
     if (!isPathWithinAllowedDirectories(normalizedReal, allowedDirectories)) {
       throw new Error(`Access denied - symlink target outside allowed directories: ${realPath}`);
     }
+
+    // Security: Check for hard link vulnerabilities
+    await checkForHardLinkVulnerability(normalizedReal, allowedDirectories);
+
     return normalizedReal;
   } catch (error: unknown) {
     // If realpath fails with ENOENT, the file doesn't exist yet
@@ -80,6 +87,10 @@ export async function validatePath(requestedPath: string): Promise<string> {
             `Access denied - parent directory outside allowed directories: ${realParentPath}`
           );
         }
+
+        // Security: Check parent directory for hard link vulnerabilities too
+        await checkForHardLinkVulnerability(normalizedParent, allowedDirectories);
+
         return normalizedRequested;
       } catch (parentError: unknown) {
         if (
@@ -99,9 +110,13 @@ export async function validatePath(requestedPath: string): Promise<string> {
 // PDF Text Extraction Function
 export async function extractPdfText(filePath: string, maxChars?: number): Promise<string> {
   try {
+    // Security: Re-validate the path before file access to prevent TOCTOU attacks
+    // This ensures the file path is still valid even if it changed since initial validation
+    const revalidatedPath = await validatePath(filePath);
+
     const { extractText } = await import('unpdf');
 
-    const pdfBuffer = await fs.readFile(filePath);
+    const pdfBuffer = await fs.readFile(revalidatedPath);
     // Convert Buffer to Uint8Array as required by unpdf
     const uint8Array = new Uint8Array(pdfBuffer);
     const { text } = await extractText(uint8Array);
