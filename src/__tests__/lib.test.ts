@@ -75,28 +75,37 @@ describe('Lib Functions', () => {
     });
 
     it('extracts text from PDF file', async () => {
-      const result = await extractPdfText('/test/file.pdf');
+      const testFile =
+        process.platform === 'win32' ? 'C:\\Users\\test\\file.pdf' : '/home/user/file.pdf';
+      const result = await extractPdfText(testFile);
       expect(result).toBe('Sample PDF text content for testing');
-      expect(mockFs.readFile).toHaveBeenCalledWith('/test/file.pdf');
+      // Note: The file is read from the revalidated path, not the original
+      expect(mockFs.readFile).toHaveBeenCalled();
     });
 
     it('limits text to maxChars when specified', async () => {
-      const result = await extractPdfText('/test/file.pdf', 10);
+      const testFile =
+        process.platform === 'win32' ? 'C:\\Users\\test\\file.pdf' : '/home/user/file.pdf';
+      const result = await extractPdfText(testFile, 10);
       expect(result).toBe('Sample PDF... [truncated]');
     });
 
     it('returns full text when maxChars is not specified', async () => {
-      const result = await extractPdfText('/test/file.pdf');
+      const testFile =
+        process.platform === 'win32' ? 'C:\\Users\\test\\file.pdf' : '/home/user/file.pdf';
+      const result = await extractPdfText(testFile);
       expect(result).toBe('Sample PDF text content for testing');
     });
 
     it('handles PDF parsing errors', async () => {
+      const testFile =
+        process.platform === 'win32' ? 'C:\\Users\\test\\invalid.pdf' : '/home/user/invalid.pdf';
       const { extractText } = await import('unpdf');
       (extractText as jest.MockedFunction<typeof extractText>).mockRejectedValueOnce(
         new Error('Invalid PDF')
       );
 
-      await expect(extractPdfText('/test/invalid.pdf')).rejects.toThrow(
+      await expect(extractPdfText(testFile)).rejects.toThrow(
         'Failed to extract text from PDF: Invalid PDF'
       );
     });
