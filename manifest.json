@@ -1,0 +1,64 @@
+{
+  "manifest_version": "0.1",
+  "name": "mcp-pdf-server",
+  "display_name": "MCP PDF Server",
+  "version": "0.1.0",
+  "description": "Model Context Protocol (MCP) server for PDF text extraction operations",
+  "long_description": "A comprehensive MCP server that provides PDF text extraction capabilities. This server allows AI assistants to read and extract text content from PDF files within allowed directories, with built-in security features to prevent unauthorized file access.",
+  "author": {
+    "name": "Johan Gorter",
+    "url": "https://github.com/johan-gorter/mcp-pdf-server"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/johan-gorter/mcp-pdf-server"
+  },
+  "homepage": "https://github.com/johan-gorter/mcp-pdf-server#readme",
+  "support": "https://github.com/johan-gorter/mcp-pdf-server/issues",
+  "server": {
+    "type": "node",
+    "entry_point": "dist/index.js",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/dist/index.js", "${user_config.allowed_directories}"],
+      "env": {}
+    }
+  },
+  "tools": [
+    {
+      "name": "extract_pdf_text",
+      "description": "Extract text content from PDF files"
+    },
+    {
+      "name": "list_allowed_directories",
+      "description": "List directories accessible to the PDF server"
+    }
+  ],
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "pdf",
+    "text-extraction",
+    "claude-desktop",
+    "typescript",
+    "nodejs"
+  ],
+  "license": "MIT",
+  "compatibility": {
+    "claude_desktop": ">=0.10.0",
+    "platforms": ["darwin", "win32", "linux"],
+    "runtimes": {
+      "node": ">=16.0.0"
+    }
+  },
+  "user_config": {
+    "allowed_directories": {
+      "type": "directory",
+      "title": "Allowed Directories",
+      "description": "Select directories that the PDF server can access for reading PDF files",
+      "multiple": true,
+      "required": true,
+      "default": ["${HOME}/Desktop", "${HOME}/Documents"]
+    }
+  }
+}

@@ -239,6 +239,53 @@ npm run test:coverage
 
 Test files are located in `src/__tests__/` and follow the pattern `*.test.ts`.
 
+### MCPB Bundle Creation
+
+This project supports creating MCPB (MCP Bundle) files for easy distribution and installation:
+
+```bash
+# Build the MCPB bundle
+npm run build:mcpb
+
+# Validate the manifest
+npm run validate:manifest
+```
+
+The MCPB bundle includes:
+- Compiled TypeScript server (`dist/`)
+- Runtime dependencies (`node_modules/`)
+- Bundle manifest (`manifest.json`)
+- Documentation and license files
+
+MCPB bundles can be installed in Claude Desktop and other MCP-compatible clients with a single click.
+
+### Release Scripts
+
+The project includes scripts for automated releases that build both npm packages and MCPB bundles:
+
+```bash
+# Patch release (0.1.0 -> 0.1.1)
+npm run release:patch
+
+# Minor release (0.1.0 -> 0.2.0)  
+npm run release:minor
+
+# Major release (0.1.0 -> 1.0.0)
+npm run release:major
+```
+
+These scripts:
+1. Run tests to ensure code quality
+2. Build the TypeScript code
+3. Create MCPB bundles
+4. Update version numbers and create git tags
+
+The GitHub Actions workflow automatically creates releases with:
+- npm package publication
+- MCPB bundle attachments
+- Artifact attestations for security
+- Docker images
+
 ### Docker Development
 
 Build and run with Docker:
