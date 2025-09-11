@@ -252,6 +252,7 @@ npm run validate:manifest
 ```
 
 The MCPB bundle includes:
+
 - Compiled TypeScript server (`dist/`)
 - Runtime dependencies (`node_modules/`)
 - Bundle manifest (`manifest.json`)
@@ -267,7 +268,7 @@ The project includes scripts for automated releases that build both npm packages
 # Patch release (0.1.0 -> 0.1.1)
 npm run release:patch
 
-# Minor release (0.1.0 -> 0.2.0)  
+# Minor release (0.1.0 -> 0.2.0)
 npm run release:minor
 
 # Major release (0.1.0 -> 1.0.0)
@@ -275,12 +276,14 @@ npm run release:major
 ```
 
 These scripts:
+
 1. Run tests to ensure code quality
 2. Build the TypeScript code
 3. Create MCPB bundles
 4. Update version numbers and create git tags
 
 The GitHub Actions workflow automatically creates releases with:
+
 - npm package publication
 - MCPB bundle attachments
 - Artifact attestations for security
