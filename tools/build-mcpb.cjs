@@ -33,8 +33,16 @@ async function buildMcpb() {
     // Copy required files to temp directory
     console.log('Copying files...');
 
-    // Copy manifest.json
-    fs.copyFileSync(path.join(projectRoot, 'manifest.json'), path.join(tempDir, 'manifest.json'));
+    // Read package.json to get version
+    const packageJson = JSON.parse(fs.readFileSync(path.join(projectRoot, 'package.json'), 'utf8'));
+
+    // Read and update manifest.json with version from package.json
+    const manifestPath = path.join(projectRoot, 'manifest.json');
+    const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+    manifest.version = packageJson.version;
+
+    // Copy updated manifest.json
+    fs.writeFileSync(path.join(tempDir, 'manifest.json'), JSON.stringify(manifest, null, 2));
 
     // Copy dist directory (compiled TypeScript)
     fs.cpSync(distDir, path.join(tempDir, 'dist'), { recursive: true });
@@ -49,8 +57,6 @@ async function buildMcpb() {
 
     // Copy only production node_modules (runtime dependencies)
     console.log('Installing production dependencies...');
-    const packageJson = JSON.parse(fs.readFileSync(path.join(projectRoot, 'package.json'), 'utf8'));
-
     // Create a minimal package.json with only runtime dependencies
     const bundlePackageJson = {
       name: packageJson.name,
