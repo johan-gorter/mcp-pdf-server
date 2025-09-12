@@ -161,7 +161,7 @@ jobs:
 
       - name: Build and push Docker image
         if: steps.decision.outputs.release_required == 'true' && !contains(steps.decision.outputs.version, '-')
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
           platforms: linux/amd64,linux/arm64
