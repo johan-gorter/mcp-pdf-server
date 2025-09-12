@@ -1,5 +1,5 @@
 {
-  "manifest_version": "0.1",
+  "dxt_version": "0.1",
   "name": "mcp-pdf-server",
   "display_name": "MCP PDF Server",
   "version": "[copied_from_package_json]",

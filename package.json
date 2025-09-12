@@ -1,6 +1,6 @@
 {
   "name": "@johangorter/mcp-pdf-server",
-  "version": "0.2.0-beta.2",
+  "version": "0.3.0",
   "description": "Model Context Protocol (MCP) server for PDF text extraction operations",
   "type": "module",
   "main": "dist/index.js",
@@ -28,14 +28,8 @@
     "lint": "eslint src/**/*.ts",
     "lint:fix": "eslint src/**/*.ts --fix",
     "type-check": "tsc --noEmit",
-    "version:patch": "npm version patch && git push && git push --tags",
-    "version:minor": "npm version minor && git push && git push --tags",
-    "version:major": "npm version major && git push && git push --tags",
     "build:mcpb": "node tools/build-mcpb.cjs",
-    "validate:manifest": "node -e \"const fs=require('fs'); const manifest=JSON.parse(fs.readFileSync('manifest.json')); console.log('✅ Manifest valid:', manifest.name, 'v' + manifest.version);\"",
-    "release:patch": "npm run test && npm run build && npm run build:mcpb && npm run version:patch",
-    "release:minor": "npm run test && npm run build && npm run build:mcpb && npm run version:minor",
-    "release:major": "npm run test && npm run build && npm run build:mcpb && npm run version:major"
+    "validate:manifest": "node -e \"const fs=require('fs'); const manifest=JSON.parse(fs.readFileSync('manifest.json')); console.log('✅ Manifest valid:', manifest.name, 'v' + manifest.version);\""
   },
   "keywords": [
     "mcp",
@@ -55,7 +49,7 @@
     "zod-to-json-schema": "^3.23.5"
   },
   "devDependencies": {
-    "@anthropic-ai/mcpb": "github:anthropics/mcpb",
+    "@anthropic-ai/mcpb": "^1.0.0",
     "@types/jest": "^29.5.5",
     "@types/node": "^22.0.0",
     "@types/pdfkit": "^0.17.2",
