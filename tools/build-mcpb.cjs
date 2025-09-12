@@ -91,8 +91,13 @@ async function buildMcpb() {
     }
 
     // Find mcpb executable - cross-platform compatible
-    const mcpbBin = path.join(projectRoot, 'node_modules', '.bin', process.platform === 'win32' ? 'mcpb.cmd' : 'mcpb');
-    
+    const mcpbBin = path.join(
+      projectRoot,
+      'node_modules',
+      '.bin',
+      process.platform === 'win32' ? 'mcpb.cmd' : 'mcpb'
+    );
+
     // Verify mcpb is available
     if (!fs.existsSync(mcpbBin)) {
       throw new Error('mcpb command not found. Please ensure @anthropic-ai/mcpb is installed.');
@@ -101,7 +106,7 @@ async function buildMcpb() {
     // Run mcpb pack command
     const packCommand = `"${mcpbBin}" pack "${tempDir}" "${bundlePath}"`;
     console.log(`Running: ${packCommand}`);
-    
+
     execSync(packCommand, {
       cwd: projectRoot,
       stdio: 'inherit',
