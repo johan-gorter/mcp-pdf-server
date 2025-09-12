@@ -39,7 +39,7 @@ jobs:
         run: |
           CUR="${{ steps.current.outputs.version }}"
           TAG="v$CUR"
-          
+
           if [ -z "$CUR" ]; then
             echo "No current version found; abort."
             echo "release_required=false" >> "$GITHUB_OUTPUT"

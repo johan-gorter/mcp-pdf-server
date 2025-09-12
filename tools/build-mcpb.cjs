@@ -35,12 +35,12 @@ async function buildMcpb() {
 
     // Read package.json to get version
     const packageJson = JSON.parse(fs.readFileSync(path.join(projectRoot, 'package.json'), 'utf8'));
-    
+
     // Read and update manifest.json with version from package.json
     const manifestPath = path.join(projectRoot, 'manifest.json');
     const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
     manifest.version = packageJson.version;
-    
+
     // Copy updated manifest.json
     fs.writeFileSync(path.join(tempDir, 'manifest.json'), JSON.stringify(manifest, null, 2));
 
