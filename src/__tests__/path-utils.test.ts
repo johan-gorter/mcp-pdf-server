@@ -89,9 +89,9 @@ describe('Path Utilities', () => {
 
       const input = 'C:\\documents\\..\\file.pdf';
       const result = normalizePath(input);
-      // path.normalize() on Linux doesn't resolve .. in Windows paths, it just normalizes separators
-      // The actual result depends on the platform where the code runs
-      expect(result).toBe(input); // path.normalize leaves Windows paths unchanged on Linux
+      // On Windows, path.normalize resolves .. components
+      const expected = 'C:\\file.pdf';
+      expect(result).toBe(expected);
 
       // Restore original platform
       Object.defineProperty(process, 'platform', {

@@ -1,7 +1,8 @@
 import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals';
 import fs from 'fs/promises';
 import path from 'path';
-import { setAllowedDirectories, validatePath } from '../lib.js';
+import { setAllowedDirectories } from '../lib.js';
+import { validatePath } from '../path-validation.js';
 
 // Mock fs module
 jest.mock('fs/promises');
@@ -34,7 +35,7 @@ describe('Security Tests', () => {
       ];
 
       for (const maliciousPath of maliciousPaths) {
-        await expect(validatePath(maliciousPath)).rejects.toThrow(/Access denied/);
+        await expect(validatePath(maliciousPath, [allowedDir])).rejects.toThrow(/Access denied/);
       }
     });
 
@@ -52,8 +53,8 @@ describe('Security Tests', () => {
         // Even if these somehow get through initial parsing,
         // they should be blocked by path validation
         const decodedPath = decodeURIComponent(encodedPath);
-        await expect(validatePath(decodedPath)).rejects.toThrow(
-          'Access denied - path outside allowed directories'
+        await expect(validatePath(decodedPath, [allowedDir])).rejects.toThrow(
+          /Access denied.*outside allowed directories/
         );
       }
     });
@@ -72,7 +73,7 @@ describe('Security Tests', () => {
         return inputPath.toString();
       });
 
-      await expect(validatePath(symlinkPath)).rejects.toThrow(
+      await expect(validatePath(symlinkPath, [allowedDir])).rejects.toThrow(
         'Access denied - symlink target outside allowed directories'
       );
     });
@@ -88,7 +89,7 @@ describe('Security Tests', () => {
         return inputPath.toString();
       });
 
-      const result = await validatePath(symlinkPath);
+      const result = await validatePath(symlinkPath, [allowedDir]);
       expect(result).toBe(targetPath);
     });
 
@@ -109,7 +110,7 @@ describe('Security Tests', () => {
         return pathStr;
       });
 
-      await expect(validatePath(filePath)).rejects.toThrow(
+      await expect(validatePath(filePath, [allowedDir])).rejects.toThrow(
         'Access denied - symlink target outside allowed directories'
       );
     });
@@ -143,7 +144,7 @@ describe('Security Tests', () => {
       });
 
       // This should pass validation
-      const result = await validatePath(testPath);
+      const result = await validatePath(testPath, [allowedDir]);
       expect(result).toBe(testPath);
 
       // But in a real scenario, by the time we read the file,
@@ -177,11 +178,11 @@ describe('Security Tests', () => {
       });
 
       // First validation should pass
-      const result = await validatePath(testPath);
+      const result = await validatePath(testPath, [allowedDir]);
       expect(result).toBe(testPath);
 
       // But subsequent validation should fail if the path changed (TOCTOU attack)
-      await expect(validatePath(testPath)).rejects.toThrow(
+      await expect(validatePath(testPath, [allowedDir])).rejects.toThrow(
         /Access denied.*symlink target outside allowed directories/
       );
 
@@ -228,7 +229,7 @@ describe('Security Tests', () => {
       const longSegment = 'a'.repeat(1000);
       const longPath = path.join(allowedDir, longSegment + '.pdf');
 
-      const result = await validatePath(longPath);
+      const result = await validatePath(longPath, [allowedDir]);
       expect(result).toBe(longPath);
     });
 
