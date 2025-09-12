@@ -237,8 +237,11 @@ describe('Security Tests', () => {
       // Skip this test on Linux since it's case-sensitive by default
       if (process.platform === 'linux') {
         // On Linux, this should fail due to case mismatch
+        mockFs.realpath.mockImplementation(async (inputPath: any) => {
+          return inputPath;
+        });
         const mixedCasePath = path.join(allowedDir.toUpperCase(), 'File.PDF');
-        await expect(validatePath(mixedCasePath)).rejects.toThrow(/Access denied/);
+        await expect(validatePath(mixedCasePath, [allowedDir])).rejects.toThrow(/Access denied/);
         return;
       }
 
