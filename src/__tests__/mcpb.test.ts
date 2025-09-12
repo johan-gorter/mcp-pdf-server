@@ -48,8 +48,9 @@ describe('MCPB Bundle', () => {
     // Run MCPB build and check output
     execSync('npm run build:mcpb', { cwd: projectRoot, stdio: 'pipe' });
 
-    // Check that MCPB file was created
-    const expectedBundleName = 'johangorter-mcp-pdf-server-0.1.0.mcpb';
+    // Check that MCPB file was created - dynamically generate expected name from package.json
+    const packageJson = JSON.parse(fs.readFileSync(path.join(projectRoot, 'package.json'), 'utf8'));
+    const expectedBundleName = `${packageJson.name.replace('@', '').replace('/', '-')}-${packageJson.version}.mcpb`;
     const bundlePath = path.join(projectRoot, expectedBundleName);
     expect(fs.existsSync(bundlePath)).toBe(true);
 
