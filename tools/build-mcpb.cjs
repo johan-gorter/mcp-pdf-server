@@ -86,7 +86,14 @@ async function buildMcpb() {
 
     // Create zip file using Node.js archiver
     console.log('Creating zip archive...');
-    const archiver = require('archiver');
+    let archiver;
+    try {
+      archiver = require('archiver');
+    } catch (error) {
+      console.error('Error: archiver module not found. Please ensure it is installed.');
+      console.error('Run: npm install or ensure archiver is in devDependencies');
+      throw error;
+    }
     const output = fs.createWriteStream(bundlePath);
     const archive = archiver('zip', { zlib: { level: 9 } });
 

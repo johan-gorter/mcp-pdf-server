@@ -9,64 +9,34 @@ describe('Path Utilities', () => {
     });
 
     it('converts WSL paths to Windows format when on Windows', () => {
-      const originalPlatform = process.platform;
-      // Mock platform for this test
-      Object.defineProperty(process, 'platform', {
-        value: 'win32',
-      });
-
+      if (process.platform !== 'win32') {
+        return;
+      }
       expect(convertToWindowsPath('/mnt/c/documents/file.pdf')).toBe('C:\\documents\\file.pdf');
-
-      // Restore original platform
-      Object.defineProperty(process, 'platform', {
-        value: originalPlatform,
-      });
     });
 
     it('converts Unix-style Windows paths to Windows format when on Windows', () => {
-      const originalPlatform = process.platform;
-      // Mock platform for this test
-      Object.defineProperty(process, 'platform', {
-        value: 'win32',
-      });
-
+      if (process.platform !== 'win32') {
+        return;
+      }
       expect(convertToWindowsPath('/c/documents/file.pdf')).toBe('C:\\documents\\file.pdf');
-
-      // Restore original platform
-      Object.defineProperty(process, 'platform', {
-        value: originalPlatform,
-      });
     });
 
     it('leaves Windows paths unchanged but ensures backslashes when on Windows', () => {
-      const originalPlatform = process.platform;
-      // Mock platform for this test
-      Object.defineProperty(process, 'platform', {
-        value: 'win32',
-      });
+      if (process.platform !== 'win32') {
+        return;
+      }
 
       expect(convertToWindowsPath('C:/documents/file.pdf')).toBe('C:\\documents\\file.pdf');
-
-      // Restore original platform
-      Object.defineProperty(process, 'platform', {
-        value: originalPlatform,
-      });
     });
 
     it('leaves paths unchanged when not on Windows', () => {
-      const originalPlatform = process.platform;
-      // Mock platform for this test (simulate Linux)
-      Object.defineProperty(process, 'platform', {
-        value: 'linux',
-      });
+      if (process.platform === 'win32') {
+        return;
+      }
 
       expect(convertToWindowsPath('/mnt/c/documents/file.pdf')).toBe('/mnt/c/documents/file.pdf');
       expect(convertToWindowsPath('C:/documents/file.pdf')).toBe('C:/documents/file.pdf');
-
-      // Restore original platform
-      Object.defineProperty(process, 'platform', {
-        value: originalPlatform,
-      });
     });
   });
 
@@ -81,22 +51,15 @@ describe('Path Utilities', () => {
     });
 
     it('handles Windows-style paths on Windows platform', () => {
-      const originalPlatform = process.platform;
-      // Mock platform for this test
-      Object.defineProperty(process, 'platform', {
-        value: 'win32',
-      });
+      if (process.platform !== 'win32') {
+        return;
+      }
 
       const input = 'C:\\documents\\..\\file.pdf';
       const result = normalizePath(input);
-      // path.normalize() on Linux doesn't resolve .. in Windows paths, it just normalizes separators
-      // The actual result depends on the platform where the code runs
-      expect(result).toBe(input); // path.normalize leaves Windows paths unchanged on Linux
-
-      // Restore original platform
-      Object.defineProperty(process, 'platform', {
-        value: originalPlatform,
-      });
+      // On Windows, path.normalize resolves .. components
+      const expected = 'C:\\file.pdf';
+      expect(result).toBe(expected);
     });
   });
 

@@ -1,5 +1,6 @@
 import path from 'path';
 import fs from 'fs/promises';
+import { normalizePath } from './path-utils.js';
 
 /**
  * Validates if a path is within the allowed directories
@@ -46,7 +47,7 @@ export function isPathWithinAllowedDirectories(
  */
 export async function checkForHardLinkVulnerability(
   filePath: string,
-  allowedDirectories: string[]
+  _allowedDirectories: string[]
 ): Promise<void> {
   try {
     const stats = await fs.stat(filePath);
@@ -66,5 +67,45 @@ export async function checkForHardLinkVulnerability(
   } catch (error) {
     // If we can't stat the file, that's probably OK - it might not exist yet
     // The main file operations will handle the file existence check
+  }
+}
+
+/**
+ * Validates a file path for security, resolving symlinks and checking against allowed directories
+ * @param filePath - The file path to validate
+ * @param allowedDirectories - Array of allowed root directories (optional, will use global if not provided)
+ * @returns Promise<string> - The resolved real path if valid
+ * @throws Error if path is invalid or outside allowed directories
+ */
+export async function validatePath(
+  filePath: string,
+  allowedDirectories?: string[]
+): Promise<string> {
+  // Normalize the input path
+  const normalizedPath = normalizePath(filePath);
+
+  try {
+    // Resolve real path to handle symlinks
+    const realPath = await fs.realpath(normalizedPath);
+
+    // If allowedDirectories is provided, validate against them
+    if (allowedDirectories && allowedDirectories.length > 0) {
+      if (!isPathWithinAllowedDirectories(realPath, allowedDirectories)) {
+        throw new Error('Access denied - symlink target outside allowed directories');
+      }
+    }
+
+    // Check for hard link vulnerabilities if directories are provided
+    if (allowedDirectories) {
+      await checkForHardLinkVulnerability(realPath, allowedDirectories);
+    }
+
+    return realPath;
+  } catch (error) {
+    if (error instanceof Error && 'code' in error && error.code === 'ENOENT') {
+      // File doesn't exist, return the normalized path for creation
+      return normalizedPath;
+    }
+    throw error;
   }
 }

@@ -368,6 +368,17 @@ npm publish
 - **Memory**: Large PDFs (>100MB) may cause memory issues
 - **No Concurrent Processing**: Processes one PDF at a time
 
+## Security Considerations
+
+⚠️ **Platform-Specific Security Notice**: This server has different security characteristics on Windows vs Linux platforms. Please review the [Platform-Specific Security Considerations](SECURITY_PLATFORM_CONSIDERATIONS.md) document for important information about:
+
+- Windows-specific security limitations and recommendations
+- Linux security protections and best practices
+- Cross-platform deployment considerations
+- Security testing and validation guidelines
+
+**Windows Users**: Exercise extra caution and review security recommendations before production use.
+
 ## Future Extensions
 
 Potential expansions while maintaining simplicity:
