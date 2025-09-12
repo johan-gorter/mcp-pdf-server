@@ -8,6 +8,8 @@ on:
     # Avoid infinite loops - don't trigger on tags
     tags-ignore:
       - '**'
+    paths:
+      - 'package.json'
 
 permissions:
   contents: write
@@ -24,7 +26,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Need history to read previous version
+          fetch-depth: 0 # Need full history
 
       - name: Read current version
         id: current
@@ -32,51 +34,33 @@ jobs:
           VERSION=$(node -p "require('./package.json').version")
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
-      - name: Read previous version
-        id: previous
-        run: |
-          if git rev-parse HEAD^ >/dev/null 2>&1; then
-            git show HEAD^:package.json > prev_package.json 2>/dev/null || echo '{}' > prev_package.json
-            PREV_VERSION=$(node -e "try{console.log(require('./prev_package.json').version||'')}catch(e){console.log('')}")
-            echo "version=$PREV_VERSION" >> "$GITHUB_OUTPUT"
-          else
-            echo "version=" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Check if release needed
-        id: decision
+      - name: Check if tag already exists
+        id: tag_check
         run: |
           CUR="${{ steps.current.outputs.version }}"
-          PREV="${{ steps.previous.outputs.version }}"
-          echo "Current: $CUR  Previous: $PREV"
-
+          TAG="v$CUR"
+          
           if [ -z "$CUR" ]; then
             echo "No current version found; abort."
             echo "release_required=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
-          if [ "$CUR" = "$PREV" ]; then
-            echo "Version unchanged."
-            echo "release_required=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          TAG="v$CUR"
+          echo "Checking if tag $TAG exists..."
           git fetch --tags --quiet
 
           if git rev-parse "$TAG" >/dev/null 2>&1; then
-            echo "Tag $TAG already exists; skipping."
+            echo "Tag $TAG already exists; skipping release."
             echo "release_required=false" >> "$GITHUB_OUTPUT"
-            exit 0
+          else
+            echo "Tag $TAG does not exist; release needed."
+            echo "release_required=true" >> "$GITHUB_OUTPUT"
+            echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+            echo "version=$CUR" >> "$GITHUB_OUTPUT"
           fi
 
-          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
-          echo "version=$CUR" >> "$GITHUB_OUTPUT"
-          echo "release_required=true" >> "$GITHUB_OUTPUT"
-
       - name: Setup Node.js
-        if: steps.decision.outputs.release_required == 'true'
+        if: steps.tag_check.outputs.release_required == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: '20.x'
@@ -84,22 +68,22 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
 
       - name: Install dependencies
-        if: steps.decision.outputs.release_required == 'true'
+        if: steps.tag_check.outputs.release_required == 'true'
         run: npm ci
 
       - name: Run tests
-        if: steps.decision.outputs.release_required == 'true'
+        if: steps.tag_check.outputs.release_required == 'true'
         run: npm test
 
       - name: Build project
-        if: steps.decision.outputs.release_required == 'true'
+        if: steps.tag_check.outputs.release_required == 'true'
         run: npm run build
 
       - name: Generate changelog
-        if: steps.decision.outputs.release_required == 'true'
+        if: steps.tag_check.outputs.release_required == 'true'
         id: changelog
         run: |
-          VERSION="${{ steps.decision.outputs.version }}"
+          VERSION="${{ steps.tag_check.outputs.version }}"
           if [ -f CHANGELOG.md ]; then
             CHANGELOG_CONTENT=$(awk '/^## \[?'"$VERSION"'\]?/{flag=1; next} /^## \[?[0-9]/{flag=0} flag' CHANGELOG.md || echo "")
             if [ -n "$CHANGELOG_CONTENT" ]; then
@@ -116,35 +100,35 @@ jobs:
           fi
 
       - name: Build MCPB bundle
-        if: steps.decision.outputs.release_required == 'true'
+        if: steps.tag_check.outputs.release_required == 'true'
         run: npm run build:mcpb
 
       - name: Generate artifact attestation for MCPB bundle
-        if: steps.decision.outputs.release_required == 'true'
+        if: steps.tag_check.outputs.release_required == 'true'
         uses: actions/attest-build-provenance@v1
         with:
           subject-path: '*.mcpb'
 
       - name: Create GitHub Release
-        if: steps.decision.outputs.release_required == 'true'
+        if: steps.tag_check.outputs.release_required == 'true'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ steps.decision.outputs.tag }}
-          name: Release ${{ steps.decision.outputs.version }}
+          tag_name: ${{ steps.tag_check.outputs.tag }}
+          name: Release ${{ steps.tag_check.outputs.version }}
           body: ${{ steps.changelog.outputs.CHANGELOG }}
           draft: false
-          prerelease: ${{ contains(steps.decision.outputs.version, '-') }}
+          prerelease: ${{ contains(steps.tag_check.outputs.version, '-') }}
           files: |
             *.mcpb
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Docker Buildx
-        if: steps.decision.outputs.release_required == 'true' && !contains(steps.decision.outputs.version, '-')
+        if: steps.tag_check.outputs.release_required == 'true' && !contains(steps.tag_check.outputs.version, '-')
         uses: docker/setup-buildx-action@v3
 
       - name: Login to GitHub Container Registry
-        if: steps.decision.outputs.release_required == 'true' && !contains(steps.decision.outputs.version, '-')
+        if: steps.tag_check.outputs.release_required == 'true' && !contains(steps.tag_check.outputs.version, '-')
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
@@ -152,19 +136,19 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Extract metadata
-        if: steps.decision.outputs.release_required == 'true' && !contains(steps.decision.outputs.version, '-')
+        if: steps.tag_check.outputs.release_required == 'true' && !contains(steps.tag_check.outputs.version, '-')
         id: meta
         uses: docker/metadata-action@v5
         with:
           images: ghcr.io/${{ github.repository }}
           tags: |
-            type=semver,pattern={{version}},value=${{ steps.decision.outputs.version }}
-            type=semver,pattern={{major}}.{{minor}},value=${{ steps.decision.outputs.version }}
-            type=semver,pattern={{major}},value=${{ steps.decision.outputs.version }}
+            type=semver,pattern={{version}},value=${{ steps.tag_check.outputs.version }}
+            type=semver,pattern={{major}}.{{minor}},value=${{ steps.tag_check.outputs.version }}
+            type=semver,pattern={{major}},value=${{ steps.tag_check.outputs.version }}
             type=raw,value=latest
 
       - name: Build and push Docker image
-        if: steps.decision.outputs.release_required == 'true' && !contains(steps.decision.outputs.version, '-')
+        if: steps.tag_check.outputs.release_required == 'true' && !contains(steps.tag_check.outputs.version, '-')
         uses: docker/build-push-action@v6
         with:
           context: .

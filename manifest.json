@@ -2,7 +2,7 @@
   "manifest_version": "0.1",
   "name": "mcp-pdf-server",
   "display_name": "MCP PDF Server",
-  "version": "0.1.0",
+  "version": "[copied_from_package_json]",
   "description": "Model Context Protocol (MCP) server for PDF text extraction operations",
   "long_description": "A comprehensive MCP server that provides PDF text extraction capabilities. This server allows AI assistants to read and extract text content from PDF files within allowed directories, with built-in security features to prevent unauthorized file access.",
   "author": {
