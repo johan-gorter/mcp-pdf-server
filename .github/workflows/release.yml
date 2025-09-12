@@ -19,12 +19,12 @@ jobs:
   check-and-release:
     name: Check Version and Create Release
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Need history to read previous version
+          fetch-depth: 0 # Need history to read previous version
 
       - name: Read current version
         id: current
@@ -47,28 +47,28 @@ jobs:
           CUR="${{ steps.current.outputs.version }}"
           PREV="${{ steps.previous.outputs.version }}"
           echo "Current: $CUR  Previous: $PREV"
-          
+
           if [ -z "$CUR" ]; then
             echo "No current version found; abort."
             echo "release_required=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          
+
           if [ "$CUR" = "$PREV" ]; then
             echo "Version unchanged."
             echo "release_required=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          
+
           TAG="v$CUR"
           git fetch --tags --quiet
-          
+
           if git rev-parse "$TAG" >/dev/null 2>&1; then
             echo "Tag $TAG already exists; skipping."
             echo "release_required=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          
+
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
           echo "version=$CUR" >> "$GITHUB_OUTPUT"
           echo "release_required=true" >> "$GITHUB_OUTPUT"
