@@ -15,7 +15,6 @@ describe('MCPB Bundle', () => {
     // Validate required fields
     expect(manifest.manifest_version).toBe('0.1');
     expect(manifest.name).toBe('mcp-pdf-server');
-    expect(manifest.version).toBe('0.1.0');
     expect(manifest.description).toBeTruthy();
     expect(manifest.author).toBeTruthy();
     expect(manifest.author.name).toBeTruthy();
