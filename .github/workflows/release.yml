@@ -13,6 +13,7 @@ jobs:
     permissions:
       contents: write
       id-token: write
+      attestations: write
 
     steps:
       - name: Checkout code
@@ -64,16 +65,25 @@ jobs:
             echo "CHANGELOG=Release ${{ steps.get_version.outputs.VERSION }}" >> $GITHUB_OUTPUT
           fi
 
-      - name: Create GitHub Release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build MCPB bundle
+        run: npm run build:mcpb
+
+      - name: Generate artifact attestation for MCPB bundle
+        uses: actions/attest-build-provenance@v1
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ steps.get_version.outputs.VERSION }}
+          subject-path: '*.mcpb'
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Release ${{ steps.get_version.outputs.VERSION }}
           body: ${{ steps.changelog.outputs.CHANGELOG }}
           draft: false
           prerelease: ${{ contains(steps.get_version.outputs.VERSION, '-') }}
+          files: |
+            *.mcpb
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish to npm
         run: npm publish --provenance --access public

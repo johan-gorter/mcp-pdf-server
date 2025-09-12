@@ -9,6 +9,10 @@ dist/
 build/
 *.tsbuildinfo
 
+# MCPB bundles
+*.mcpb
+temp-mcpb-build/
+
 # Runtime data
 pids
 *.pid

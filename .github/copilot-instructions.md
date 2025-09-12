@@ -85,11 +85,24 @@ npm run format
 npm run format:check
 ```
 
-**ALWAYS run these before committing or the CI will fail:**
+**CRITICAL: ALWAYS run these before any commits or CI will fail:**
 
 ```bash
 npm run lint && npm run format && npm run type-check
 ```
+
+**MANDATORY FORMATTING RULE**: Every code change MUST be properly formatted with Prettier before committing. Use `npm run format` to fix formatting issues automatically. Never commit code with formatting violations.
+
+### Pre-Commit Formatting Requirements
+
+Before making ANY commit, you MUST:
+
+1. **Always run `npm run format`** to fix all formatting issues
+2. **Verify with `npm run format:check`** that no formatting issues remain
+3. **Never bypass or ignore formatting errors** - they will cause CI failures
+4. **Format everything** - documentation, code, JSON files, etc.
+
+These requirements are enforced by CI and failures will block PR merges.
 
 ## Validation Scenarios
 
