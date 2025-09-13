@@ -80,8 +80,8 @@ async function buildMcpb() {
       stdio: 'inherit',
     });
 
-    // Create the zip file
-    console.log('Creating MCPB bundle...');
+    // Create the MCPB bundle using the official mcpb pack command
+    console.log('Creating MCPB bundle with mcpb pack...');
     const bundleName = `${packageJson.name.replace('@', '').replace('/', '-')}-${packageJson.version}.mcpb`;
     const bundlePath = path.join(projectRoot, bundleName);
 
@@ -90,39 +90,37 @@ async function buildMcpb() {
       fs.unlinkSync(bundlePath);
     }
 
-    // Create zip file using Node.js archiver
-    console.log('Creating zip archive...');
-    let archiver;
-    try {
-      archiver = require('archiver');
-    } catch (error) {
-      console.error('Error: archiver module not found. Please ensure it is installed.');
-      console.error('Run: npm install or ensure archiver is in devDependencies');
-      throw error;
+    // Find mcpb executable - cross-platform compatible
+    const mcpbBin = path.join(
+      projectRoot,
+      'node_modules',
+      '.bin',
+      process.platform === 'win32' ? 'mcpb.cmd' : 'mcpb'
+    );
+
+    // Verify mcpb is available
+    if (!fs.existsSync(mcpbBin)) {
+      throw new Error('mcpb command not found. Please ensure @anthropic-ai/mcpb is installed.');
     }
-    const output = fs.createWriteStream(bundlePath);
-    const archive = archiver('zip', { zlib: { level: 9 } });
 
-    await new Promise((resolve, reject) => {
-      output.on('close', () => {
-        console.log(`MCPB bundle created: ${bundleName} (${archive.pointer()} bytes)`);
-        resolve();
-      });
+    // Run mcpb pack command
+    console.log(`Running: mcpb pack "${tempDir}" "${bundlePath}"`);
+    const packCommand = `"${mcpbBin}" pack "${tempDir}" "${bundlePath}"`;
+    console.log(`Running: ${packCommand}`);
 
-      archive.on('error', (err) => {
-        reject(err);
-      });
-
-      archive.pipe(output);
-      archive.directory(tempDir, false);
-      archive.finalize();
+    execSync(packCommand, {
+      cwd: projectRoot,
+      stdio: 'inherit',
     });
 
+    // Verify bundle was created and show stats
     if (fs.existsSync(bundlePath)) {
       const stats = fs.statSync(bundlePath);
       console.log(
         `✅ MCPB bundle created: ${bundleName} (${(stats.size / 1024 / 1024).toFixed(2)} MB)`
       );
+    } else {
+      throw new Error('MCPB bundle was not created successfully');
     }
   } catch (error) {
     console.error('Error building MCPB bundle:', error.message);
