@@ -105,8 +105,10 @@ async function buildMcpb() {
 
     // Run mcpb pack command
     console.log(`Running: mcpb pack "${tempDir}" "${bundlePath}"`);
+    const packCommand = `"${mcpbBin}" pack "${tempDir}" "${bundlePath}"`;
+    console.log(`Running: ${packCommand}`);
 
-    execFileSync(mcpbBin, ['pack', tempDir, bundlePath], {
+    execSync(packCommand, {
       cwd: projectRoot,
       stdio: 'inherit',
     });
