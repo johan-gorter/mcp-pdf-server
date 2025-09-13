@@ -73,7 +73,9 @@ describe('getValidRootDirectories', () => {
         { uri: `file://${invalidPath}`, name: 'Invalid Path' },
       ];
 
-      const result = (await getValidRootDirectories(roots)).map(d => d.replace(/runneradmin/g, 'RUNNER~1'));
+      const result = (await getValidRootDirectories(roots)).map((d) =>
+        d.replace(/runneradmin/g, 'RUNNER~1')
+      );
 
       expect(result).toContain(testDir1);
       expect(result).not.toContain(nonExistentDir);
