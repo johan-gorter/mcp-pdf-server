@@ -105,7 +105,7 @@ jobs:
 
       - name: Generate artifact attestation for MCPB bundle
         if: steps.tag_check.outputs.release_required == 'true'
-        uses: actions/attest-build-provenance@v1
+        uses: actions/attest-build-provenance@v3
         with:
           subject-path: '*.mcpb'
 
