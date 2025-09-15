@@ -40,7 +40,9 @@ describe('getValidRootDirectories', () => {
         { uri: testDir3 }, // Plain path without name property
       ];
 
-      const result = (await getValidRootDirectories(roots)).map(d => d.replace(/runneradmin/g, 'RUNNER~1'));
+      const result = (await getValidRootDirectories(roots)).map((d) =>
+        d.replace(/runneradmin/g, 'RUNNER~1')
+      );
 
       expect(result).toContain(testDir1);
       expect(result).toContain(testDir2);
@@ -55,7 +57,9 @@ describe('getValidRootDirectories', () => {
 
       const roots = [{ uri: `file://${testDir1}/./subdir/../subdir`, name: 'Complex Path' }];
 
-      const result = (await getValidRootDirectories(roots)).map(d => d.replace(/runneradmin/g, 'RUNNER~1'));
+      const result = (await getValidRootDirectories(roots)).map((d) =>
+        d.replace(/runneradmin/g, 'RUNNER~1')
+      );
 
       expect(result).toHaveLength(1);
       expect(result[0]).toBe(subDir);
