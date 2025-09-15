@@ -8,7 +8,6 @@ WORKDIR /app
 # Copy pre-built application and all dependencies
 COPY dist ./dist
 COPY node_modules ./node_modules
-COPY test ./test
 COPY package*.json ./
 
 # Set the entrypoint
