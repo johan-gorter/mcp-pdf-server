@@ -114,21 +114,49 @@ export async function extractPdfText(filePath: string, maxChars?: number): Promi
     // This ensures the file path is still valid even if it changed since initial validation
     const revalidatedPath = await validatePath(filePath);
 
-    const { extractText } = await import('unpdf');
+    // Temporarily suppress console output during PDF extraction to prevent
+    // library warnings from corrupting the MCP JSON-RPC protocol over stdio
+    const originalConsoleWarn = console.warn;
+    const originalConsoleLog = console.log;
+    const originalConsoleError = console.error;
 
-    const pdfBuffer = await fs.readFile(revalidatedPath);
-    // Convert Buffer to Uint8Array as required by unpdf
-    const uint8Array = new Uint8Array(pdfBuffer);
-    const { text } = await extractText(uint8Array);
+    // Redirect stdout/stderr during PDF extraction
+    const originalStdoutWrite = process.stdout.write;
+    const originalStderrWrite = process.stderr.write;
 
-    // unpdf returns an array of strings (one per page), so join them
-    let extractedText = Array.isArray(text) ? text.join('\n\n') : text;
+    try {
+      // Suppress all console output during PDF extraction
+      console.warn = () => {};
+      console.log = () => {};
+      console.error = () => {};
 
-    if (maxChars && maxChars > 0 && extractedText.length > maxChars) {
-      extractedText = extractedText.substring(0, maxChars) + '... [truncated]';
+      // Suppress direct stdout/stderr writes
+      process.stdout.write = () => true;
+      process.stderr.write = () => true;
+
+      const { extractText } = await import('unpdf');
+
+      const pdfBuffer = await fs.readFile(revalidatedPath);
+      // Convert Buffer to Uint8Array as required by unpdf
+      const uint8Array = new Uint8Array(pdfBuffer);
+      const { text } = await extractText(uint8Array);
+
+      // unpdf returns an array of strings (one per page), so join them
+      let extractedText = Array.isArray(text) ? text.join('\n\n') : text;
+
+      if (maxChars && maxChars > 0 && extractedText.length > maxChars) {
+        extractedText = extractedText.substring(0, maxChars) + '... [truncated]';
+      }
+
+      return extractedText;
+    } finally {
+      // Always restore console and stdout/stderr, even if an error occurs
+      console.warn = originalConsoleWarn;
+      console.log = originalConsoleLog;
+      console.error = originalConsoleError;
+      process.stdout.write = originalStdoutWrite;
+      process.stderr.write = originalStderrWrite;
     }
-
-    return extractedText;
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(`Failed to extract text from PDF: ${error.message}`);

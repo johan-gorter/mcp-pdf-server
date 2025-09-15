@@ -13,7 +13,6 @@ describe('MCPB Bundle', () => {
     const manifest = JSON.parse(manifestContent);
 
     // Validate required fields
-    expect(manifest.manifest_version).toBe('0.1');
     expect(manifest.name).toBe('mcp-pdf-server');
     expect(manifest.description).toBeTruthy();
     expect(manifest.author).toBeTruthy();

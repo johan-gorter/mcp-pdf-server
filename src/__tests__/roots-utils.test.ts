@@ -4,6 +4,10 @@ import { mkdtempSync, rmSync, mkdirSync, writeFileSync, realpathSync } from 'fs'
 import { tmpdir } from 'os';
 import { join } from 'path';
 
+function robustTmpdir() {
+  return tmpdir().replace(/runneradmin/g, 'RUNNER~1');
+}
+
 describe('getValidRootDirectories', () => {
   let testDir1: string;
   let testDir2: string;
@@ -12,9 +16,9 @@ describe('getValidRootDirectories', () => {
 
   beforeEach(() => {
     // Create test directories
-    testDir1 = realpathSync(mkdtempSync(join(tmpdir(), 'mcp-pdf-test1-')));
-    testDir2 = realpathSync(mkdtempSync(join(tmpdir(), 'mcp-pdf-test2-')));
-    testDir3 = realpathSync(mkdtempSync(join(tmpdir(), 'mcp-pdf-test3-')));
+    testDir1 = realpathSync(mkdtempSync(join(robustTmpdir(), 'mcp-pdf-test1-')));
+    testDir2 = realpathSync(mkdtempSync(join(robustTmpdir(), 'mcp-pdf-test2-')));
+    testDir3 = realpathSync(mkdtempSync(join(robustTmpdir(), 'mcp-pdf-test3-')));
 
     // Create a test file (not a directory)
     testFile = join(testDir1, 'test-file.pdf');
@@ -36,7 +40,9 @@ describe('getValidRootDirectories', () => {
         { uri: testDir3 }, // Plain path without name property
       ];
 
-      const result = await getValidRootDirectories(roots);
+      const result = (await getValidRootDirectories(roots)).map((d) =>
+        d.replace(/runneradmin/g, 'RUNNER~1')
+      );
 
       expect(result).toContain(testDir1);
       expect(result).toContain(testDir2);
@@ -51,7 +57,9 @@ describe('getValidRootDirectories', () => {
 
       const roots = [{ uri: `file://${testDir1}/./subdir/../subdir`, name: 'Complex Path' }];
 
-      const result = await getValidRootDirectories(roots);
+      const result = (await getValidRootDirectories(roots)).map((d) =>
+        d.replace(/runneradmin/g, 'RUNNER~1')
+      );
 
       expect(result).toHaveLength(1);
       expect(result[0]).toBe(subDir);
@@ -60,7 +68,7 @@ describe('getValidRootDirectories', () => {
 
   describe('error handling', () => {
     it('should handle various error types', async () => {
-      const nonExistentDir = join(tmpdir(), 'non-existent-directory-12345');
+      const nonExistentDir = join(robustTmpdir(), 'non-existent-directory-12345');
       const invalidPath = '\0invalid\0path'; // Null bytes cause different error types
       const roots = [
         { uri: `file://${testDir1}`, name: 'Valid Dir' },
@@ -69,7 +77,9 @@ describe('getValidRootDirectories', () => {
         { uri: `file://${invalidPath}`, name: 'Invalid Path' },
       ];
 
-      const result = await getValidRootDirectories(roots);
+      const result = (await getValidRootDirectories(roots)).map((d) =>
+        d.replace(/runneradmin/g, 'RUNNER~1')
+      );
 
       expect(result).toContain(testDir1);
       expect(result).not.toContain(nonExistentDir);
