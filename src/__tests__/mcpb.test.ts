@@ -34,7 +34,7 @@ describe('MCPB Bundle', () => {
 
   test('can build MCPB bundle', () => {
     // This test ensures the build process works
-    const buildScript = path.join(projectRoot, 'tools', 'build-mcpb.cjs');
+    const buildScript = path.join(projectRoot, 'tools', 'build-mcpb.js');
     expect(fs.existsSync(buildScript)).toBe(true);
 
     // Ensure dist directory exists
