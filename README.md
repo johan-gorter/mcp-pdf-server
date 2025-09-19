@@ -19,7 +19,22 @@ Based on the patterns from [@modelcontextprotocol/server-filesystem](https://git
 
 ## Installation
 
-### Desktop Extension (.mcpb)
+### General MCP Clients
+
+Add the following to your mcp server configuration file:
+
+```json
+{
+  "mcpServers": {
+    "pdf-reader": {
+      "command": "npx",
+      "args": ["-y", "@johangorter/mcp-pdf-server", "/Users/username/Desktop"]
+    }
+  }
+}
+```
+
+### Desktop Extension (.mcpb) for Claude Desktop
 
 For more information about Desktop Extensions, see the [official MCPB documentation](https://www.anthropic.com/engineering/desktop-extensions).
 

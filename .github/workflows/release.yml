@@ -109,6 +109,12 @@ jobs:
         with:
           subject-path: '*.mcpb'
 
+      - name: Publish to npm
+        if: steps.tag_check.outputs.release_required == 'true' && !contains(steps.tag_check.outputs.version, '-')
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
       - name: Create GitHub Release
         if: steps.tag_check.outputs.release_required == 'true'
         uses: softprops/action-gh-release@v2
