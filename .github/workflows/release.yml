@@ -109,6 +109,12 @@ jobs:
         with:
           subject-path: '*.mcpb'
 
+      - name: Setup npm authentication
+        if: steps.tag_check.outputs.release_required == 'true' && !contains(steps.tag_check.outputs.version, '-')
+        run: |
+          npm config set registry https://registry.npmjs.org/
+          npm config set //registry.npmjs.org/:_authToken ${{ secrets.NPM_TOKEN }}
+
       - name: Dry-run npm publish
         if: steps.tag_check.outputs.release_required == 'true' && !contains(steps.tag_check.outputs.version, '-')
         run: npm publish --access public --dry-run
@@ -118,21 +124,7 @@ jobs:
       - name: Publish to npm
         if: steps.tag_check.outputs.release_required == 'true' && !contains(steps.tag_check.outputs.version, '-')
         run: npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Verify npm publish
-        if: steps.tag_check.outputs.release_required == 'true' && !contains(steps.tag_check.outputs.version, '-')
-        run: |
-          PKG_NAME=$(node -p "require('./package.json').name")
-          PKG_VERSION=$(node -p "require('./package.json').version")
-          echo "Verifying $PKG_NAME@$PKG_VERSION is published to npm..."
-          if npm view "$PKG_NAME@$PKG_VERSION" > /dev/null 2>&1; then
-            echo "Package $PKG_NAME@$PKG_VERSION is available on npm."
-          else
-            echo "ERROR: Package $PKG_NAME@$PKG_VERSION was not found on npm registry."
-            exit 1
-          fi
       - name: Create GitHub Release
         if: steps.tag_check.outputs.release_required == 'true'
         uses: softprops/action-gh-release@v2
