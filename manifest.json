@@ -4,7 +4,7 @@
   "display_name": "MCP PDF Server",
   "version": "[copied_from_package_json]",
   "description": "Model Context Protocol (MCP) server for PDF text extraction operations",
-  "long_description": "A comprehensive MCP server that provides PDF text extraction capabilities. This server allows AI assistants to read and extract text content from PDF files within allowed directories, with built-in security features to prevent unauthorized file access.",
+  "long_description": "An MCP server that provides PDF text extraction capabilities. This server allows AI assistants to read and extract text content from PDF files within allowed directories, restricted to configured paths for security. It is built using Node.js and TypeScript, leveraging the Model Context Protocol SDK and the unpdf library for PDF processing.",
   "author": {
     "name": "Johan Gorter",
     "url": "https://github.com/johan-gorter/mcp-pdf-server"
@@ -58,7 +58,7 @@
       "description": "Select directories that the PDF server can access for reading PDF files",
       "multiple": true,
       "required": true,
-      "default": ["${HOME}/Desktop", "${HOME}/Documents"]
+      "default": []
     }
   }
 }

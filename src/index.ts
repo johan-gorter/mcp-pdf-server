@@ -77,11 +77,14 @@ const ListAllowedDirectoriesArgsSchema = z.object({});
 const ToolInputSchema = ToolSchema.shape.inputSchema;
 type ToolInput = z.infer<typeof ToolInputSchema>;
 
+// Read package.json
+const packageJson = JSON.parse(await fs.readFile('package.json', 'utf-8'));
+
 // Server setup
 const server = new Server(
   {
-    name: 'mcp-pdf-server',
-    version: '0.1.0',
+    name: packageJson.name,
+    version: packageJson.version,
   },
   {
     capabilities: {

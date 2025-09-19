@@ -14,9 +14,6 @@ npm install
 
 # Build TypeScript to JavaScript - takes ~2 seconds, NEVER CANCEL
 npm run build
-
-# Run tests - takes ~5-8 seconds, NEVER CANCEL
-npm test
 ```
 
 ## Running the Server
@@ -28,12 +25,6 @@ node dist/index.js /path/to/allowed/directory
 # Example with temporary directory
 mkdir -p /tmp/pdfs
 node dist/index.js /tmp/pdfs
-
-# Development mode (builds and runs)
-npm run dev
-
-# Production mode
-npm run start /path/to/allowed/directory
 ```
 
 **IMPORTANT**: The server requires at least one allowed directory argument or it will not start. The server communicates via stdio (stdin/stdout) using the MCP protocol.
@@ -46,12 +37,6 @@ npm run start /path/to/allowed/directory
 # Build - takes ~2 seconds, NEVER CANCEL
 npm run build
 
-# Build in watch mode (for development)
-npm run watch
-
-# Type check without building - takes ~3 seconds
-npm run type-check
-
 # Clean build artifacts
 npm run clean
 ```
@@ -61,9 +46,6 @@ npm run clean
 ```bash
 # Run all tests - takes ~5-8 seconds, NEVER CANCEL, set timeout to 30+ seconds
 npm test
-
-# Run tests in watch mode
-npm run test:watch
 
 # Run tests with coverage - takes ~8 seconds, NEVER CANCEL, set timeout to 30+ seconds
 npm run test:coverage
@@ -85,51 +67,15 @@ npm run format
 npm run format:check
 ```
 
+**MANDATORY FORMATTING RULE**: Every code change MUST be properly formatted with Prettier before committing. Use `npm run format` to fix formatting issues automatically. Never commit code with formatting violations.
+
 **CRITICAL: ALWAYS run these before any commits or CI will fail:**
 
 ```bash
-npm run lint && npm run format && npm run type-check
+npm run lint && npm run format && npm run build && npm test
 ```
-
-**MANDATORY FORMATTING RULE**: Every code change MUST be properly formatted with Prettier before committing. Use `npm run format` to fix formatting issues automatically. Never commit code with formatting violations.
-
-### Pre-Commit Formatting Requirements
-
-Before making ANY commit, you MUST:
-
-1. **Always run `npm run format`** to fix all formatting issues
-2. **Verify with `npm run format:check`** that no formatting issues remain
-3. **Never bypass or ignore formatting errors** - they will cause CI failures
-4. **Format everything** - documentation, code, JSON files, etc.
 
 These requirements are enforced by CI and failures will block PR merges.
-
-## Validation Scenarios
-
-### Complete End-to-End Validation
-
-After making any changes, ALWAYS run this complete validation:
-
-```bash
-# 1. Install and build
-npm install
-npm run build
-
-# 2. Run all tests and quality checks
-npm test
-npm run test:coverage
-npm run lint
-npm run format:check
-npm run type-check
-
-# 3. Test server functionality
-mkdir -p /tmp/test_pdfs
-timeout 5s node dist/index.js /tmp/test_pdfs
-# Should output: "Warning: Indexing all PDF objects" and "MCP PDF Server running on stdio"
-
-# 4. Clean up test files
-rm -rf /tmp/test_pdfs
-```
 
 ### Manual Functional Testing
 
@@ -163,12 +109,6 @@ Key directories and files:
 
 ## Common Issues and Workarounds
 
-### Docker Build Issues
-
-**Problem**: Docker build may fail in some environments due to npm issues
-
-**Workaround**: Docker functionality is implemented but may not work in all CI environments. Focus on Node.js development workflow.
-
 ### Empty Allowed Directories
 
 **Problem**: Server exits with error about no allowed directories
@@ -183,7 +123,7 @@ node dist/index.js /some/allowed/directory
 
 The project uses GitHub Actions with these workflows:
 
-- **ci.yml**: Tests on Node.js 18.x, 22.x on Ubuntu. Runs lint, format, type-check, build, and tests
+- **ci.yml**: Tests on Node.js 18.x, 22.x on Ubuntu. Runs lint, format, build, and tests
 - **release.yml**: Automated releases on version tags, publishes to npm and Docker
 - **security.yml**: Weekly security audits
 
@@ -221,11 +161,4 @@ The server implements strict path validation:
 
 ## Release Process
 
-```bash
-# Automated releases (recommended)
-npm run release:patch    # Bug fixes (0.1.0 -> 0.1.1)
-npm run release:minor    # New features (0.1.0 -> 0.2.0)
-npm run release:major    # Breaking changes (0.1.0 -> 1.0.0)
-```
-
-These scripts run tests, bump version, create git tags, and trigger automated CI/CD.
+Merging a changed version in `package.json` to `main` or `release/*` triggers a release workflow that creates a release with artifacts. See `.github/workflows/release.yml` for details.

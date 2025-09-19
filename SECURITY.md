@@ -1,5 +1,7 @@
 # Security Model
 
+**DISCLAIMER:** This file has been written using Claude AI. I personally have not verified these claims.
+
 This document outlines the security measures implemented in the MCP PDF Server to protect against various attack vectors.
 
 ## Security Features
