@@ -1,8 +1,5 @@
 # PDF MCP Server
 
-**DISCLAIMER**
-This project has been written using Claude AI, with [@modelcontextprotocol/server-filesystem](https://github.com/modelcontextprotocol/servers/tree/main/src/filesystem) as an example and reference. I personally have not read all the code and cannot vouch for its security or correctness. Use at your own risk.
-
 [![CI](https://github.com/johan-gorter/mcp-pdf-server/actions/workflows/ci.yml/badge.svg)](https://github.com/johan-gorter/mcp-pdf-server/actions/workflows/ci.yml)
 [![Release](https://github.com/johan-gorter/mcp-pdf-server/actions/workflows/release.yml/badge.svg)](https://github.com/johan-gorter/mcp-pdf-server/actions/workflows/release.yml)
 [![npm version](https://badge.fury.io/js/@johangorter%2Fmcp-pdf-server.svg)](https://badge.fury.io/js/@johangorter%2Fmcp-pdf-server)
@@ -18,41 +15,21 @@ Based on the patterns from [@modelcontextprotocol/server-filesystem](https://git
 - **Directory Access**: Same security model as filesystem MCP server
 - **Text Limiting**: `max_chars` parameter to control output size and token usage
 - **Secure**: Path validation and sandboxed directory access
-- **Fast**: Lightweight Node.js implementation using pdf-parse
+- **Fast**: Lightweight Node.js implementation using unpdf
 
 ## Installation
 
-### Claude Desktop (Recommended)
+### Desktop Extension (.mcpb)
 
-Add to your `claude_desktop_config.json`:
+For more information about Desktop Extensions, see the [official MCPB documentation](https://www.anthropic.com/engineering/desktop-extensions).
 
-```json
-{
-  "mcpServers": {
-    "pdf-reader": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@johangorter/mcp-pdf-server",
-        "/Users/username/Desktop",
-        "/Users/username/Downloads"
-      ]
-    }
-  }
-}
-```
-
-### Desktop Extension (.dxt)
-
-For more information about Desktop Extensions, see the [official DXT documentation](https://www.anthropic.com/engineering/desktop-extensions).
-
-1. Download the `.dxt` file
+1. Download the `.mcpb` file from the [Releases](https://github.com/johan-gorter/mcp-pdf-server/releases) page.
 2. Navigate to Settings > Extensions in Claude Desktop
-3. Click "Install Extension" and select the `.dxt` file
+3. Click "Install Extension" and select the `.mcpb` file
 
 ## Usage
 
-The server provides one tool:
+The server provides one main tool:
 
 ### `extract_pdf_text`
 
@@ -112,8 +89,7 @@ Standard MCP error codes:
 
 ### Prerequisites
 
-- Node.js 16+
-- npm or yarn
+- Node.js 22+
 - TypeScript
 
 ### Setup
@@ -135,49 +111,11 @@ npm run build
 This project uses GitHub Actions for automated testing and deployment:
 
 - **CI Pipeline**: Runs on every push and pull request
-  - Tests on Node.js 18.x, 20.x, 22.x
-  - Tests on Ubuntu, Windows, and macOS
+  - Tests on Ubuntu and Windows
   - Runs linting, formatting checks, and tests
-  - Uploads test coverage to Codecov
-
-- **Release Pipeline**: Triggers on version tags (e.g., `v1.2.3`)
-  - Automatically publishes to npm
-  - Creates GitHub releases with changelog
+- **Release Pipeline**: Triggers on package.json version changes
+  - Creates GitHub releases with MCPB bundle
   - Builds and publishes Docker images
-
-### Release Process
-
-This project uses semantic versioning. To create a new release:
-
-```bash
-# For bug fixes (1.0.0 -> 1.0.1)
-npm run release:patch
-
-# For new features (1.0.0 -> 1.1.0)
-npm run release:minor
-
-# For breaking changes (1.0.0 -> 2.0.0)
-npm run release:major
-```
-
-These commands will:
-
-1. Run tests to ensure quality
-2. Bump version in package.json
-3. Create git commit and tag
-4. Push to GitHub (triggering automated release)
-
-### Manual Version Management
-
-You can also manage versions manually:
-
-```bash
-# Update version and create tag
-npm version patch|minor|major
-
-# Push with tags
-git push && git push --tags
-```
 
 ### Development Scripts
 
@@ -215,9 +153,6 @@ npm run format
 # Check code formatting
 npm run format:check
 
-# Type check without emitting files
-npm run type-check
-
 # Clean build artifacts
 npm run clean
 ```
@@ -246,9 +181,6 @@ This project supports creating MCPB (MCP Bundle) files for easy distribution and
 ```bash
 # Build the MCPB bundle
 npm run build:mcpb
-
-# Validate the manifest
-npm run validate:manifest
 ```
 
 The MCPB bundle includes:
@@ -259,35 +191,6 @@ The MCPB bundle includes:
 - Documentation and license files
 
 MCPB bundles can be installed in Claude Desktop and other MCP-compatible clients with a single click.
-
-### Release Scripts
-
-The project includes scripts for automated releases that build both npm packages and MCPB bundles:
-
-```bash
-# Patch release (0.1.0 -> 0.1.1)
-npm run release:patch
-
-# Minor release (0.1.0 -> 0.2.0)
-npm run release:minor
-
-# Major release (0.1.0 -> 1.0.0)
-npm run release:major
-```
-
-These scripts:
-
-1. Run tests to ensure code quality
-2. Build the TypeScript code
-3. Create MCPB bundles
-4. Update version numbers and create git tags
-
-The GitHub Actions workflow automatically creates releases with:
-
-- npm package publication
-- MCPB bundle attachments
-- Artifact attestations for security
-- Docker images
 
 ### Docker Development
 
@@ -349,18 +252,6 @@ mcp-pdf-server/
 └── README.md
 ```
 
-### Publishing
-
-The package is automatically built before publishing:
-
-```bash
-# Prepare for publishing (runs build automatically)
-npm run prepare
-
-# Publish to npm
-npm publish
-```
-
 ## Limitations
 
 - **Text Only**: No image, table, or metadata extraction
@@ -368,30 +259,6 @@ npm publish
 - **Memory**: Large PDFs (>100MB) may cause memory issues
 - **No Concurrent Processing**: Processes one PDF at a time
 
-## Security Considerations
-
-⚠️ **Platform-Specific Security Notice**: This server has different security characteristics on Windows vs Linux platforms. Please review the [Platform-Specific Security Considerations](SECURITY_PLATFORM_CONSIDERATIONS.md) document for important information about:
-
-- Windows-specific security limitations and recommendations
-- Linux security protections and best practices
-- Cross-platform deployment considerations
-- Security testing and validation guidelines
-
-**Windows Users**: Exercise extra caution and review security recommendations before production use.
-
-## Future Extensions
-
-Potential expansions while maintaining simplicity:
-
-- `extract_pdf_metadata` - Document properties
-- `extract_pdf_pages` - Specific page ranges
-- OCR support for scanned documents
-- Table extraction for structured data
-
 ## License
 
-MIT License - Same as official MCP servers
-
-## Contributing
-
-Follow the patterns established by [@modelcontextprotocol/servers](https://github.com/modelcontextprotocol/servers) for consistency with the MCP ecosystem.
+MIT License

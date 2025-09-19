@@ -1,6 +1,6 @@
 {
   "name": "@johangorter/mcp-pdf-server",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Model Context Protocol (MCP) server for PDF text extraction operations",
   "type": "module",
   "main": "dist/index.js",
@@ -27,9 +27,7 @@
     "format:check": "prettier --check .",
     "lint": "eslint src/**/*.ts",
     "lint:fix": "eslint src/**/*.ts --fix",
-    "type-check": "tsc --noEmit",
-    "build:mcpb": "node tools/build-mcpb.cjs",
-    "validate:manifest": "node -e \"const fs=require('fs'); const manifest=JSON.parse(fs.readFileSync('manifest.json')); console.log('✅ Manifest valid:', manifest.name, 'v' + manifest.version);\""
+    "build:mcpb": "node tools/build-mcpb.js"
   },
   "keywords": [
     "mcp",
@@ -65,7 +63,7 @@
     "typescript": "^5.9.2"
   },
   "engines": {
-    "node": ">=16.0.0"
+    "node": ">=18.0.0"
   },
   "repository": {
     "type": "git",
