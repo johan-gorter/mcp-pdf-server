@@ -78,7 +78,9 @@ const ToolInputSchema = ToolSchema.shape.inputSchema;
 type ToolInput = z.infer<typeof ToolInputSchema>;
 
 // Read package.json
-const packageJson = JSON.parse(await fs.readFile('package.json', 'utf-8'));
+const packageJson = JSON.parse(
+  await fs.readFile(path.join(import.meta.dirname, '../package.json'), 'utf-8')
+);
 
 // Server setup
 const server = new Server(

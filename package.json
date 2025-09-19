@@ -1,6 +1,6 @@
 {
   "name": "@johangorter/mcp-pdf-server",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "Model Context Protocol (MCP) server for PDF text extraction operations",
   "type": "module",
   "main": "dist/index.js",
