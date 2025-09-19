@@ -109,6 +109,22 @@ jobs:
         with:
           subject-path: '*.mcpb'
 
+      - name: Setup npm authentication
+        if: steps.tag_check.outputs.release_required == 'true' && !contains(steps.tag_check.outputs.version, '-')
+        run: |
+          npm config set registry https://registry.npmjs.org/
+          npm config set //registry.npmjs.org/:_authToken ${{ secrets.NPM_TOKEN }}
+
+      - name: Dry-run npm publish
+        if: steps.tag_check.outputs.release_required == 'true' && !contains(steps.tag_check.outputs.version, '-')
+        run: npm publish --access public --dry-run
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish to npm
+        if: steps.tag_check.outputs.release_required == 'true' && !contains(steps.tag_check.outputs.version, '-')
+        run: npm publish --access public
+
       - name: Create GitHub Release
         if: steps.tag_check.outputs.release_required == 'true'
         uses: softprops/action-gh-release@v2
