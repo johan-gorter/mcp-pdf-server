@@ -1,5 +1,5 @@
 {
-  "dxt_version": "0.1",
+  "manifest_version": "0.2",
   "name": "mcp-pdf-server",
   "display_name": "MCP PDF Server",
   "version": "[copied_from_package_json]",
@@ -48,7 +48,7 @@
     "claude_desktop": ">=0.10.0",
     "platforms": ["darwin", "win32", "linux"],
     "runtimes": {
-      "node": ">=16.0.0"
+      "node": ">=18.0.0"
     }
   },
   "user_config": {
