@@ -1,7 +1,7 @@
 # Simple single-stage Dockerfile that works by copying pre-built assets
 # For development, run: npm run build && docker build -t mcp-pdf-server .
 
-FROM node:24-alpine
+FROM node:25-alpine
 
 WORKDIR /app
 
