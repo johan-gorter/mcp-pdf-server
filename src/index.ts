@@ -7,6 +7,7 @@ import {
   ListToolsRequestSchema,
   RootsListChangedNotificationSchema,
   type Root,
+  type Tool,
 } from '@modelcontextprotocol/sdk/types.js';
 import fs from 'fs/promises';
 import path from 'path';
@@ -73,14 +74,9 @@ const ExtractPdfTextArgsSchema = z.object({
 
 const ListAllowedDirectoriesArgsSchema = z.object({});
 
-// Define a type for tool input schema that is compatible with the MCP SDK
+// Use the inputSchema type from the SDK's Tool type
 // This avoids type inference issues with Zod 3.25+ and zod-to-json-schema
-type ToolInput = {
-  type: 'object';
-  properties?: Record<string, unknown>;
-  required?: string[];
-  [key: string]: unknown;
-};
+type ToolInput = Tool['inputSchema'];
 
 // Read package.json
 const packageJson = JSON.parse(
