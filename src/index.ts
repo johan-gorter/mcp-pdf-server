@@ -5,13 +5,12 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
-  ToolSchema,
   RootsListChangedNotificationSchema,
   type Root,
 } from '@modelcontextprotocol/sdk/types.js';
 import fs from 'fs/promises';
 import path from 'path';
-import { z } from 'zod';
+import { z } from 'zod/v3';
 import { zodToJsonSchema } from 'zod-to-json-schema';
 import { normalizePath, expandHome } from './path-utils.js';
 import { getValidRootDirectories } from './roots-utils.js';
@@ -74,8 +73,14 @@ const ExtractPdfTextArgsSchema = z.object({
 
 const ListAllowedDirectoriesArgsSchema = z.object({});
 
-const ToolInputSchema = ToolSchema.shape.inputSchema;
-type ToolInput = z.infer<typeof ToolInputSchema>;
+// Define a type for tool input schema that is compatible with the MCP SDK
+// This avoids type inference issues with Zod 3.25+ and zod-to-json-schema
+type ToolInput = {
+  type: 'object';
+  properties?: Record<string, unknown>;
+  required?: string[];
+  [key: string]: unknown;
+};
 
 // Read package.json
 const packageJson = JSON.parse(
