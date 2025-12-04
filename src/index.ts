@@ -74,9 +74,6 @@ const ExtractPdfTextArgsSchema = z.object({
 
 const ListAllowedDirectoriesArgsSchema = z.object({});
 
-const ToolInputSchema = ToolSchema.shape.inputSchema;
-type ToolInput = z.infer<typeof ToolInputSchema>;
-
 // Read package.json
 const packageJson = JSON.parse(
   await fs.readFile(path.join(import.meta.dirname, '../package.json'), 'utf-8')
@@ -107,7 +104,8 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           'limiting the output size via max_chars parameter to prevent context overflow. ' +
           "Only works with PDF files containing embedded text - scanned PDFs without OCR won't work. " +
           'Only works within allowed directories.',
-        inputSchema: zodToJsonSchema(ExtractPdfTextArgsSchema) as ToolInput,
+        // Type cast needed due to type inference issue between Zod 3.25.x and zod-to-json-schema
+        inputSchema: zodToJsonSchema(ExtractPdfTextArgsSchema as any),
       },
       {
         name: 'list_allowed_directories',
@@ -116,7 +114,8 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           'Subdirectories within these allowed directories are also accessible. ' +
           'Use this to understand which directories and their nested paths are available ' +
           'before trying to access PDF files.',
-        inputSchema: zodToJsonSchema(ListAllowedDirectoriesArgsSchema) as ToolInput,
+        // Type cast needed due to type inference issue between Zod 3.25.x and zod-to-json-schema
+        inputSchema: zodToJsonSchema(ListAllowedDirectoriesArgsSchema as any),
       },
     ],
   };
